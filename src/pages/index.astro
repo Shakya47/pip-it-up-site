@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import HeroDemo from '../components/HeroDemo.tsx';
+import FeatureGrid from '../components/FeatureGrid.astro';
+import EditorDemos from '../components/EditorDemos.tsx';
+import CodeTabs from '../components/CodeTabs.tsx';
+import BrowserSupport from '../components/BrowserSupport.astro';
+import Comparison from '../components/Comparison.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <Hero />
+
+  <!-- Live demo (React island) -->
+  <div class="relative -mt-8 mb-16 px-4">
+    <HeroDemo client:load />
+  </div>
+
+  <!-- Feature Grid -->
+  <FeatureGrid />
+
+  <!-- Editor Demos (React islands) -->
+  <div data-reveal>
+    <EditorDemos client:load />
+  </div>
+
+  <!-- Code Tabs (React island) -->
+  <div data-reveal>
+    <CodeTabs client:load />
+  </div>
+
+  <!-- Browser Support -->
+  <BrowserSupport />
+
+  <!-- Comparison Table -->
+  <Comparison />
+
+  <!-- Footer -->
+  <Footer />
+</BaseLayout>

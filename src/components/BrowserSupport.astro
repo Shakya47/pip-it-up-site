@@ -1,0 +1,66 @@
+---
+const browsers = [
+  { name: 'Chrome', version: '116+', supported: true, icon: 'chrome' },
+  { name: 'Edge', version: '116+', supported: true, icon: 'edge' },
+  { name: 'Firefox', version: 'N/A', supported: false, note: 'Fallback', icon: 'firefox' },
+  { name: 'Safari', version: 'N/A', supported: false, note: 'Fallback', icon: 'safari' },
+];
+---
+
+<section id="browser-support" class="relative py-24 px-4 sm:px-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-12" data-reveal>
+      <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+        Browser <span class="gradient-text">Support</span>
+      </h2>
+      <p class="text-lg text-[var(--color-text-muted)] max-w-xl mx-auto">
+        Built on the <a href="https://developer.chrome.com/docs/web-platform/document-picture-in-picture/" target="_blank" rel="noopener" class="text-[var(--color-accent-light)] hover:underline">Document Picture-in-Picture API</a> with graceful fallbacks.
+      </p>
+    </div>
+
+    <div class="glass-card overflow-hidden" data-reveal>
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-[var(--color-border)]">
+            <th class="px-6 py-4 text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Browser</th>
+            <th class="px-6 py-4 text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Version</th>
+            <th class="px-6 py-4 text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {browsers.map((browser, i) => (
+            <tr class:list={['transition-colors hover:bg-[var(--color-bg-card-hover)]', i < browsers.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <span class="text-lg font-medium text-white">{browser.name}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-[var(--color-text-muted)] font-mono text-sm">{browser.version}</td>
+              <td class="px-6 py-4">
+                {browser.supported ? (
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-emerald)]/10 text-[var(--color-emerald)] text-sm font-medium">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                    Full Support
+                  </span>
+                ) : (
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-amber)]/10 text-[var(--color-amber)] text-sm font-medium">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4.99c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
+                    {browser.note}
+                  </span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <!-- Note -->
+      <div class="px-6 py-4 border-t border-[var(--color-border)] bg-[var(--color-bg-code)]">
+        <p class="text-sm text-[var(--color-text-dim)] flex items-start gap-2">
+          <svg class="w-4 h-4 mt-0.5 shrink-0 text-[var(--color-text-dim)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Requires <strong class="text-[var(--color-text-muted)]">HTTPS</strong> and a <strong class="text-[var(--color-text-muted)]">user gesture</strong> (click or keypress) to open the PiP window.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

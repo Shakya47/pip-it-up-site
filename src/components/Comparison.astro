@@ -1,0 +1,85 @@
+---
+const features = [
+  'Document PiP API',
+  'Style sync (live)',
+  'Portal mode',
+  'Controlled + uncontrolled',
+  'Decoupled trigger',
+  'Keyboard forwarding',
+  'Fixed-size guard',
+  'SSR-safe',
+  'Framework-agnostic core',
+  'TypeScript-first',
+];
+
+type Support = 'yes' | 'no' | 'partial';
+
+const packages: { name: string; npm: string; support: Support[] }[] = [
+  {
+    name: '@pip-it-up/react',
+    npm: 'https://www.npmjs.com/package/@pip-it-up/react',
+    support: ['yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes'],
+  },
+  {
+    name: 'react-pip',
+    npm: 'https://www.npmjs.com/package/react-pip',
+    support: ['partial', 'no', 'no', 'no', 'no', 'no', 'no', 'partial', 'no', 'partial'],
+  },
+  {
+    name: 'picture-in-picture',
+    npm: 'https://www.npmjs.com/package/picture-in-picture',
+    support: ['partial', 'no', 'no', 'no', 'no', 'no', 'no', 'partial', 'no', 'no'],
+  },
+];
+
+function getIcon(support: Support) {
+  if (support === 'yes') return { symbol: '✓', class: 'text-[var(--color-emerald)]' };
+  if (support === 'partial') return { symbol: '~', class: 'text-[var(--color-amber)]' };
+  return { symbol: '✗', class: 'text-[var(--color-rose)]' };
+}
+---
+
+<section id="comparison" class="relative py-24 px-4 sm:px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12" data-reveal>
+      <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+        How it <span class="gradient-text">compares</span>
+      </h2>
+      <p class="text-lg text-[var(--color-text-muted)] max-w-xl mx-auto">
+        A complete solution — not just a wrapper around the browser API.
+      </p>
+    </div>
+
+    <div class="glass-card overflow-x-auto" data-reveal>
+      <table class="w-full text-left min-w-[600px]">
+        <thead>
+          <tr class="border-b border-[var(--color-border)]">
+            <th class="px-5 py-4 text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider sticky left-0 bg-[var(--color-bg-card)] z-10">Feature</th>
+            {packages.map((pkg) => (
+              <th class="px-5 py-4 text-center">
+                <a href={pkg.npm} target="_blank" rel="noopener" class="text-sm font-semibold text-white hover:text-[var(--color-accent-light)] transition-colors font-mono">
+                  {pkg.name}
+                </a>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {features.map((feature, i) => (
+            <tr class:list={['transition-colors hover:bg-[var(--color-bg-card-hover)]', i < features.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
+              <td class="px-5 py-3.5 text-sm text-[var(--color-text)] sticky left-0 bg-[var(--color-bg-card)] z-10">{feature}</td>
+              {packages.map((pkg) => {
+                const icon = getIcon(pkg.support[i]);
+                return (
+                  <td class="px-5 py-3.5 text-center">
+                    <span class:list={['font-bold text-lg', icon.class]}>{icon.symbol}</span>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
