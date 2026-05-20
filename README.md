@@ -17,7 +17,7 @@ Pop any UI component — editors, dashboards, video players, chat widgets — in
 
 | Package | Description |
 | :------ | :---------- |
-| [`@pip-it-up/core`](https://www.npmjs.com/package/@pip-it-up/core) | Framework-agnostic JavaScript engine |
+| [`@pip-it-up/core`](https://www.npmjs.com/package/@pip-it-up/core) | Framework-agnostic JavaScript library |
 | [`@pip-it-up/react`](https://www.npmjs.com/package/@pip-it-up/react) | React components, hooks & context |
 
 ## 🚀 Quickstart
