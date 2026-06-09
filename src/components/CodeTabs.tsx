@@ -52,7 +52,7 @@ export class AppComponent {}`,
 <script>
   import { PipWrapper, PipTrigger } from '@pip-it-up/svelte';
 </script>
-
+ 
 <PipWrapper>
   <PipTrigger />
   <MyEditor />
@@ -88,16 +88,6 @@ interface Token {
   type: TokenType;
   text: string;
 }
-
-const COLORS: Record<TokenType, string> = {
-  keyword: '#a78bfa',
-  string: '#34d399',
-  comment: '#555570',
-  tag: '#7c5cff',
-  attr: '#22d3ee',
-  number: '#fbbf24',
-  plain: '#e8e8f0',
-};
 
 function tokenize(code: string): Token[] {
   const tokens: Token[] = [];
@@ -201,7 +191,7 @@ function HighlightedCode({ code }: { code: string }) {
         <div key={lineIdx} className="leading-relaxed">
           {line === '' ? '\n' : (
             tokenize(line).map((token, tokenIdx) => (
-              <span key={tokenIdx} style={{ color: COLORS[token.type] }}>
+              <span key={tokenIdx} className={`token-${token.type}`}>
                 {token.text}
               </span>
             ))
@@ -228,42 +218,42 @@ export default function CodeTabs() {
       <div className="max-w-3xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">
             Dead simple{' '}
-            <span className="bg-gradient-to-r from-[#7c5cff] via-[#22d3ee] to-[#a78bfa] bg-clip-text text-transparent">
+            <span className="gradient-text">
               integration
             </span>
           </h2>
-          <p className="text-lg text-[#8888a0] max-w-xl mx-auto">
+          <p className="text-base text-[var(--color-text-muted)] max-w-xl mx-auto">
             Wrap your component, drop in a trigger — you're done.
           </p>
         </div>
 
         {/* Code card */}
-        <div className="rounded-2xl border border-[#1e1e30] bg-[#0d0d14] overflow-hidden shadow-2xl shadow-[rgba(124,92,255,0.06)]">
+        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-code)] overflow-hidden shadow-2xl">
           {/* Tab bar */}
-          <div className="flex items-center border-b border-[#1e1e30] overflow-x-auto">
+          <div className="flex items-center border-b border-[var(--color-border)] overflow-x-auto">
             {frameworks.map((fw, i) => (
               <button
                 key={fw.name}
                 type="button"
-                onClick={() => { setActiveTab(i); setCopied(false); }}
-                className={`relative px-5 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
+                onClick={() => { if (fw.active) { setActiveTab(i); setCopied(false); } }}
+                className={`relative px-5 py-3 text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                   i === activeTab
                     ? 'text-white'
                     : fw.active
-                    ? 'text-[#8888a0] hover:text-[#e8e8f0]'
-                    : 'text-[#555570] cursor-default'
+                    ? 'text-[var(--color-text-muted)] hover:text-white'
+                    : 'text-[var(--color-text-dim)] opacity-50 cursor-not-allowed'
                 }`}
               >
                 {fw.name}
                 {!fw.active && (
-                  <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full bg-[#1e1e30] text-[#555570]">
+                  <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--color-bg-card)] text-[var(--color-text-dim)]">
                     soon
                   </span>
                 )}
                 {i === activeTab && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7c5cff]" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--color-accent)]" />
                 )}
               </button>
             ))}
@@ -272,15 +262,15 @@ export default function CodeTabs() {
             <button
               type="button"
               onClick={handleCopy}
-              className="ml-auto mr-3 p-2 rounded-lg text-[#8888a0] hover:text-white hover:bg-[#1a1a28] transition-colors"
+              className="ml-auto mr-3 p-2 rounded-lg text-[var(--color-text-muted)] hover:text-white hover:bg-[var(--color-bg-card-hover)] transition-colors cursor-pointer"
               title="Copy code"
             >
-              {copied ? <Check size={15} className="text-[#34d399]" /> : <Copy size={15} />}
+              {copied ? <Check size={15} className="text-[var(--color-emerald)]" /> : <Copy size={15} />}
             </button>
           </div>
 
           {/* Code block */}
-          <div className="p-5 overflow-x-auto">
+          <div className="p-5 overflow-x-auto text-[var(--color-text)]">
             <pre className="text-sm font-mono">
               <code>
                 <HighlightedCode code={active.code} />

@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocsPage from '../components/DocsPage.tsx';
+---
+
+<BaseLayout
+  title="Documentation — pip-it-up: The Document Picture-in-Picture Toolkit"
+  description="API reference, configurations, integrations (Tailwind, Monaco, Tiptap, Next.js), fallback mechanisms, and Chrome Extension recipes for pip-it-up."
+>
+  <div class="relative min-h-screen">
+    <DocsPage client:load />
+  </div>
+</BaseLayout>
