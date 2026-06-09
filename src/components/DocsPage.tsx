@@ -180,6 +180,32 @@ export default function DocsPage() {
                 </ul>
               </div>
             ))}
+            {/* External Links */}
+            <div className="flex flex-col gap-1.5 border-t border-[var(--color-border)] pt-4 mt-2">
+              <h4 className="text-[10px] font-bold tracking-wider text-[var(--color-text-dim)] uppercase px-2 mb-1">
+                Resources
+              </h4>
+              <ul className="flex flex-col gap-1 px-2.5 text-xs text-[var(--color-text-muted)] font-medium">
+                <li>
+                  <a href="https://github.com/Shakya47/pip-it-up" target="_blank" rel="noopener" className="hover:text-white transition-colors flex items-center justify-between py-1 group">
+                    <span>GitHub Repository</span>
+                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-light)] transition-colors">↗</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" className="hover:text-white transition-colors flex items-center justify-between py-1 group font-mono">
+                    <span>@pip-it-up/core</span>
+                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-light)] transition-colors">↗</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" className="hover:text-white transition-colors flex items-center justify-between py-1 group font-mono">
+                    <span>@pip-it-up/react</span>
+                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-light)] transition-colors">↗</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </nav>
         ) : (
           /* Search Results Pane */

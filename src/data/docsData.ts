@@ -47,7 +47,12 @@ export const docsData: DocCategory[] = [
         keywords: ['install', 'npm', 'yarn', 'pnpm', 'react quickstart', 'vanilla quickstart', 'elements'],
         summary: 'How to install and run pip-it-up in your project.',
         content: `
-          <p>Get started by installing the package for your stack. We support React and Vanilla JavaScript natively.</p>
+          <p>
+            Get started by installing the packages for your stack (view on NPM: 
+            <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" class="text-[var(--color-accent-light)] hover:underline font-mono">@pip-it-up/core</a> and 
+            <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" class="text-[var(--color-accent-light)] hover:underline font-mono">@pip-it-up/react</a>). 
+            We support React and Vanilla JavaScript natively.
+          </p>
 
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>npm install @pip-it-up/react @pip-it-up/core</code></pre>
 

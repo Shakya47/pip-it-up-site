@@ -249,7 +249,7 @@ export default function EditorDemos() {
       <div className="max-w-6xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-14">
-          <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-white">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">
             Works with{' '}
             <span className="gradient-text">
               real editors

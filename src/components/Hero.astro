@@ -25,7 +25,7 @@
     </p>
 
     <!-- Install command -->
-    <div class="animate-fade-in-up flex justify-center mb-10" style="animation-delay: 0.2s">
+    <div class="animate-fade-in-up flex flex-col items-center gap-3 mb-10" style="animation-delay: 0.2s">
       <div id="install-command" class="group relative inline-flex items-center gap-3 px-5 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-code)] font-mono text-sm cursor-pointer hover:border-[var(--color-accent-light)] transition-colors duration-200">
         <span class="text-[var(--color-text-dim)]">$</span>
         <span class="text-[var(--color-text)]">npm i @pip-it-up/react</span>
@@ -43,6 +43,17 @@
         <span id="copy-tooltip" class="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 rounded bg-[var(--color-accent)] text-white text-xs font-medium opacity-0 pointer-events-none transition-opacity duration-150">
           Copied!
         </span>
+      </div>
+
+      <!-- NPM Links -->
+      <div class="flex items-center gap-3 text-xs text-[var(--color-text-muted)] font-mono">
+        <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" class="hover:text-[var(--color-accent-light)] transition-colors inline-flex items-center gap-1">
+          @pip-it-up/core <span class="text-[9px] text-[var(--color-text-dim)]">↗</span>
+        </a>
+        <span class="text-[var(--color-text-dim)]">•</span>
+        <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" class="hover:text-[var(--color-accent-light)] transition-colors inline-flex items-center gap-1">
+          @pip-it-up/react <span class="text-[9px] text-[var(--color-text-dim)]">↗</span>
+        </a>
       </div>
     </div>
 
