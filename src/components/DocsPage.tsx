@@ -80,7 +80,7 @@ export default function DocsPage() {
       wrapper.className = 'copy-btn-wrapper absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10';
       
       const button = document.createElement('button');
-      button.className = 'p-1.5 rounded bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-white transition-colors cursor-pointer';
+      button.className = 'p-1.5 rounded bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors cursor-pointer';
       button.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
       
       button.addEventListener('click', () => {
@@ -132,13 +132,17 @@ export default function DocsPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-24 flex flex-col md:flex-row gap-8 relative">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-24 flex flex-col md:flex-row gap-8 relative z-10">
       
-      {/* ─── Left Sidebar Navigation ─── */}
-      <aside className="w-full md:w-64 shrink-0 flex flex-col gap-6 md:sticky md:top-24 md:h-[calc(100vh-120px)] md:overflow-y-auto pr-2 scrollbar-thin">
-        
+      {/* ─── Left Sidebar Navigation (Notepad card) ─── */}
+      <aside className="w-full md:w-64 shrink-0 bg-white border-2 border-[var(--color-border)] p-6 shadow-md relative md:sticky md:top-24 md:h-[calc(100vh-120px)] md:overflow-y-auto rotate-[-0.5deg] z-10 font-handwritten">
+        {/* Red Thumbtack pin */}
+        <div className="thumbtack !-top-3.5 !left-1/2 !-translate-x-1/2"></div>
+        {/* Washi tape label */}
+        <div className="absolute -bottom-3 -right-2 washi-tape washi-tape-orange text-xs rotate-[-5deg]">INDEX</div>
+
         {/* Search Box */}
-        <div className="relative">
+        <div className="relative mb-6">
           <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--color-text-dim)]">
             <Search size={15} />
           </span>
@@ -147,7 +151,7 @@ export default function DocsPage() {
             placeholder="Search docs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[var(--color-bg-code)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text)] placeholder-[var(--color-text-dim)] focus:outline-none focus:border-[var(--color-accent-light)] transition-colors"
+            className="w-full pl-9 pr-4 py-2 bg-[#fbfbf9] border-2 border-[var(--color-border)] rounded-md font-sans text-sm text-[var(--color-text)] placeholder-[var(--color-text-dim)] focus:outline-none focus:border-[var(--color-accent-light)] shadow-sm"
           />
         </div>
 
@@ -156,7 +160,7 @@ export default function DocsPage() {
           <nav className="flex flex-col gap-6">
             {docsData.map((cat) => (
               <div key={cat.id} className="flex flex-col gap-1.5">
-                <h4 className="text-[10px] font-bold tracking-wider text-[var(--color-text-dim)] uppercase px-2 mb-1">
+                <h4 className="text-base font-bold tracking-wider text-[var(--color-accent-dark)] uppercase px-2 mb-1">
                   {cat.title}
                 </h4>
                 <ul className="flex flex-col gap-1">
@@ -166,10 +170,10 @@ export default function DocsPage() {
                       <li key={sec.id}>
                         <button
                           onClick={() => selectSection(sec.id)}
-                          className={`w-full text-left py-1.5 px-2.5 rounded-lg text-sm transition-all cursor-pointer font-medium ${
+                          className={`w-full text-left py-1 px-2.5 rounded text-base transition-all cursor-pointer font-bold ${
                             isActive
-                              ? 'text-white bg-[var(--color-bg-card)] border-l-2 border-[var(--color-accent)] font-semibold'
-                              : 'text-[var(--color-text-muted)] hover:text-white hover:bg-[var(--color-bg-card-hover)]/30 border-l border-transparent'
+                              ? 'text-[var(--color-text)] bg-amber-100/70 border border-[var(--color-border)] rotate-[1deg]'
+                              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-slate-50 border border-transparent'
                           }`}
                         >
                           {sec.title}
@@ -180,28 +184,29 @@ export default function DocsPage() {
                 </ul>
               </div>
             ))}
+
             {/* External Links */}
             <div className="flex flex-col gap-1.5 border-t border-[var(--color-border)] pt-4 mt-2">
-              <h4 className="text-[10px] font-bold tracking-wider text-[var(--color-text-dim)] uppercase px-2 mb-1">
+              <h4 className="text-base font-bold tracking-wider text-[var(--color-accent-dark)] uppercase px-2 mb-1">
                 Resources
               </h4>
-              <ul className="flex flex-col gap-1 px-2.5 text-xs text-[var(--color-text-muted)] font-medium">
+              <ul className="flex flex-col gap-1 px-2.5 text-sm text-[var(--color-text-muted)] font-bold">
                 <li>
-                  <a href="https://github.com/Shakya47/pip-it-up" target="_blank" rel="noopener" className="hover:text-white transition-colors flex items-center justify-between py-1 group">
+                  <a href="https://github.com/Shakya47/pip-it-up" target="_blank" rel="noopener" className="hover:text-[var(--color-text)] transition-colors flex items-center justify-between py-1 group">
                     <span>GitHub Repository</span>
-                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-light)] transition-colors">↗</span>
+                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-dark)] transition-colors">↗</span>
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" className="hover:text-white transition-colors flex items-center justify-between py-1 group font-mono">
+                  <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" className="hover:text-[var(--color-text)] transition-colors flex items-center justify-between py-1 group font-mono">
                     <span>@pip-it-up/core</span>
-                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-light)] transition-colors">↗</span>
+                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-dark)] transition-colors">↗</span>
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" className="hover:text-white transition-colors flex items-center justify-between py-1 group font-mono">
+                  <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" className="hover:text-[var(--color-text)] transition-colors flex items-center justify-between py-1 group font-mono">
                     <span>@pip-it-up/react</span>
-                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-light)] transition-colors">↗</span>
+                    <span className="text-[10px] text-[var(--color-text-dim)] group-hover:text-[var(--color-accent-dark)] transition-colors">↗</span>
                   </a>
                 </li>
               </ul>
@@ -210,8 +215,8 @@ export default function DocsPage() {
         ) : (
           /* Search Results Pane */
           <div className="flex flex-col gap-3">
-            <h4 className="text-[10px] font-bold tracking-wider text-[var(--color-text-dim)] uppercase px-2">
-              Search Results ({searchResults.length})
+            <h4 className="text-base font-bold tracking-wider text-[var(--color-accent-dark)] uppercase px-2">
+              Results ({searchResults.length})
             </h4>
             {searchResults.length > 0 ? (
               <ul className="flex flex-col gap-2">
@@ -227,10 +232,10 @@ export default function DocsPage() {
                       <div className="text-[10px] text-[var(--color-text-dim)] font-semibold uppercase mb-0.5">
                         {categoryTitle}
                       </div>
-                      <div className="text-sm font-semibold text-white group-hover:text-[var(--color-accent-light)] transition-colors">
+                      <div className="text-sm font-semibold text-[var(--color-text)] group-hover:text-[var(--color-accent-dark)] transition-colors">
                         {section.title}
                       </div>
-                      <div className="text-xs text-[var(--color-text-muted)] line-clamp-1 mt-1">
+                      <div className="text-xs text-[var(--color-text-muted)] line-clamp-1 mt-1 font-sans">
                         {section.summary}
                       </div>
                     </button>
@@ -238,7 +243,7 @@ export default function DocsPage() {
                 ))}
               </ul>
             ) : (
-              <div className="text-xs text-[var(--color-text-dim)] px-2 py-4">
+              <div className="text-xs text-[var(--color-text-dim)] px-2 py-4 font-sans">
                 No results match your query.
               </div>
             )}
@@ -246,15 +251,20 @@ export default function DocsPage() {
         )}
       </aside>
 
-      {/* ─── Main Content Pane ─── */}
-      <main className="flex-1 min-w-0">
+      {/* ─── Main Content Pane (Typewriter sheet) ─── */}
+      <main className="flex-1 min-w-0 bg-white border-2 border-[var(--color-border)] p-6 sm:p-10 shadow-md relative rotate-[0.5deg]">
+        {/* Pink Washi tape on top-right */}
+        <div className="absolute -top-4 -right-4 washi-tape washi-tape-pink text-xs rotate-[4deg] z-10">DOCS</div>
+        {/* Blue Washi tape on bottom-left */}
+        <div className="absolute -bottom-4 -left-6 washi-tape washi-tape-blue text-xs rotate-[-8deg] z-10">★ COMPLIANT</div>
+
         <div className="max-w-2xl">
           {/* Header */}
           <div className="mb-8 border-b border-[var(--color-border)] pb-8">
-            <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2 font-sans leading-tight">
+            <h1 className="text-4xl font-extrabold tracking-tight text-[var(--color-text)] mb-2 font-handwritten leading-tight">
               {activeSection.title}
             </h1>
-            <p className="text-base text-[var(--color-text-muted)] leading-relaxed">
+            <p className="text-base text-[var(--color-text-muted)] leading-relaxed font-typewriter">
               {activeSection.summary}
             </p>
           </div>
@@ -283,7 +293,7 @@ export default function DocsPage() {
                       className="flex flex-col items-start p-3 rounded-lg border border-[var(--color-border)] hover:border-[var(--color-accent-light)] bg-[var(--color-bg-card)] hover:bg-[var(--color-bg-card-hover)] cursor-pointer text-left max-w-[45%]"
                     >
                       <span className="text-[10px] text-[var(--color-text-dim)] font-semibold uppercase tracking-wider mb-1">Previous</span>
-                      <span className="text-sm font-bold text-white leading-snug line-clamp-1">{prevSec.title}</span>
+                      <span className="text-sm font-bold text-[var(--color-text)] leading-snug line-clamp-1">{prevSec.title}</span>
                     </button>
                   ) : (
                     <div />
@@ -294,7 +304,7 @@ export default function DocsPage() {
                       className="flex flex-col items-end p-3 rounded-lg border border-[var(--color-border)] hover:border-[var(--color-accent-light)] bg-[var(--color-bg-card)] hover:bg-[var(--color-bg-card-hover)] cursor-pointer text-right max-w-[45%]"
                     >
                       <span className="text-[10px] text-[var(--color-text-dim)] font-semibold uppercase tracking-wider mb-1">Next</span>
-                      <span className="text-sm font-bold text-white leading-snug line-clamp-1">{nextSec.title}</span>
+                      <span className="text-sm font-bold text-[var(--color-text)] leading-snug line-clamp-1">{nextSec.title}</span>
                     </button>
                   ) : (
                     <div />
@@ -324,9 +334,9 @@ export default function DocsPage() {
                     e.preventDefault();
                     document.getElementById(heading.id)?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="text-xs text-[var(--color-text-muted)] hover:text-white transition-colors flex items-start gap-1 group py-0.5 line-clamp-2"
+                  className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors flex items-start gap-1 group py-0.5 line-clamp-2"
                 >
-                  <Hash size={10} className="text-[var(--color-text-dim)] mt-0.5 shrink-0 group-hover:text-[var(--color-accent-light)] transition-colors" />
+                  <Hash size={10} className="text-[var(--color-text-dim)] mt-0.5 shrink-0 group-hover:text-[var(--color-accent-dark)] transition-colors" />
                   <span>{heading.text}</span>
                 </a>
               </li>
