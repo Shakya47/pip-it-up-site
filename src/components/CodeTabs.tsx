@@ -218,60 +218,53 @@ export default function CodeTabs() {
       <div className="max-w-3xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">
-            Dead simple{' '}
-            <span className="gradient-text">
-              integration
-            </span>
+          <h2 className="text-4xl sm:text-5xl font-handwritten font-extrabold mb-4 text-[var(--color-text)]">
+            Dead simple integration
           </h2>
-          <p className="text-base text-[var(--color-text-muted)] max-w-xl mx-auto">
-            Wrap your component, drop in a trigger — you're done.
+          <p className="text-base font-typewriter text-[var(--color-text-muted)] max-w-xl mx-auto">
+            Wrap your component, code lines, a trigger — you're done.
           </p>
         </div>
 
-        {/* Code card */}
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-code)] overflow-hidden shadow-2xl">
-          {/* Tab bar */}
-          <div className="flex items-center border-b border-[var(--color-border)] overflow-x-auto">
-            {frameworks.map((fw, i) => (
-              <button
-                key={fw.name}
-                type="button"
-                onClick={() => { if (fw.active) { setActiveTab(i); setCopied(false); } }}
-                className={`relative px-5 py-3 text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                  i === activeTab
-                    ? 'text-white'
-                    : fw.active
-                    ? 'text-[var(--color-text-muted)] hover:text-white'
-                    : 'text-[var(--color-text-dim)] opacity-50 cursor-not-allowed'
-                }`}
-              >
-                {fw.name}
-                {!fw.active && (
-                  <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--color-bg-card)] text-[var(--color-text-dim)]">
-                    soon
-                  </span>
-                )}
-                {i === activeTab && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--color-accent)]" />
-                )}
-              </button>
-            ))}
-
-            {/* Copy button */}
+        {/* Tab row (Notebook Divider Tabs) */}
+        <div className="flex items-end gap-1.5 px-4 overflow-x-auto relative z-10 -mb-[2px] font-handwritten">
+          {frameworks.map((fw, i) => (
             <button
+              key={fw.name}
               type="button"
-              onClick={handleCopy}
-              className="ml-auto mr-3 p-2 rounded-lg text-[var(--color-text-muted)] hover:text-white hover:bg-[var(--color-bg-card-hover)] transition-colors cursor-pointer"
-              title="Copy code"
+              onClick={() => { if (fw.active) { setActiveTab(i); setCopied(false); } }}
+              className={`relative px-4 py-2 text-lg font-bold border-t-2 border-x-2 border-[var(--color-border)] rounded-t-md transition-all cursor-pointer ${
+                i === activeTab
+                  ? 'bg-white text-[var(--color-text)] translate-y-[2px] pb-3 shadow-none z-20'
+                  : fw.active
+                  ? 'bg-slate-200/80 hover:bg-slate-100/90 text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                  : 'bg-slate-200/40 text-[var(--color-text-dim)] opacity-60 cursor-not-allowed'
+              }`}
             >
-              {copied ? <Check size={15} className="text-[var(--color-emerald)]" /> : <Copy size={15} />}
+              {fw.name}
+              {!fw.active && (
+                <span className="ml-1.5 text-[10px] px-1 py-0.5 rounded bg-slate-300 text-slate-600 font-bold font-sans">
+                  soon
+                </span>
+              )}
             </button>
-          </div>
+          ))}
 
-          {/* Code block */}
-          <div className="p-5 overflow-x-auto text-[var(--color-text)]">
-            <pre className="text-sm font-mono">
+          {/* Copy button */}
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="ml-auto mr-1 mb-2 p-1.5 rounded border border-[var(--color-border)] hover:bg-white text-[var(--color-text)] shadow-sm bg-slate-100 transition-colors cursor-pointer"
+            title="Copy code"
+          >
+            {copied ? <Check size={14} className="text-[var(--color-emerald)]" /> : <Copy size={14} />}
+          </button>
+        </div>
+
+        {/* Code printout (Dot-matrix continuous feed paper) */}
+        <div className="dot-matrix-paper border-2 border-[var(--color-border)] px-8 sm:px-12 py-8 overflow-x-auto shadow-md">
+          <div className="text-[var(--color-text)]">
+            <pre className="text-sm font-mono overflow-x-auto">
               <code>
                 <HighlightedCode code={active.code} />
               </code>

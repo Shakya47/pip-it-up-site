@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { PipWrapper, PipTrigger, useIsPipSupported } from '@pip-it-up/react';
+import { PipWrapper, PipTrigger, usePip } from '@pip-it-up/react';
 import { ExternalLink, X, Type, Bold, Italic, List, Quote } from 'lucide-react';
 
 const MonacoEditorComponent = lazy(() => import('@monaco-editor/react'));
@@ -37,15 +37,9 @@ function TiptapToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
 }
 
 function TiptapDemo() {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: `<h3>Rich Text Editor</h3><p>This is a <strong>Tiptap editor</strong> that preserves its full state — including <em>cursor position</em>, formatting, and undo history — when popped into PiP.</p><ul><li>Try formatting some text</li><li>Click "Pop out"</li><li>Keep editing in the floating window</li></ul><blockquote>The MutationObserver keeps all styles synced in real time.</blockquote>`,
-    editorProps: {
-      attributes: {
-        class: 'tiptap-editor px-4 py-3 outline-none',
-      },
-    },
-  });
+  const [content, setContent] = useState(
+    `<h3>Rich Text Editor</h3><p>This is a <strong>Tiptap editor</strong> that preserves its full state — including <em>cursor position</em>, formatting, and undo history — when popped into PiP.</p><ul><li>Try formatting some text</li><li>Click "Pop out"</li><li>Keep editing in the floating window</li></ul><blockquote>The MutationObserver keeps all styles synced in real time.</blockquote>`
+  );
 
   return (
     <PipWrapper
@@ -53,62 +47,100 @@ function TiptapDemo() {
       copyStyles="sync"
       fallback="none"
       placeholder={
-        <div className="flex flex-col items-center justify-center h-[420px] bg-[var(--color-bg-code)] rounded-lg border border-dashed border-[var(--color-border)] text-[var(--color-text-dim)]">
-          <p className="text-sm font-medium text-[var(--color-text-muted)]">Tiptap editor is in PiP</p>
-          <PipTrigger className="mt-4 px-4 py-2 bg-[var(--color-accent)]/15 text-[var(--color-accent-light)] rounded-lg text-xs hover:bg-[var(--color-accent)]/25 cursor-pointer">
+        <div className="flex flex-col items-center justify-center h-[420px] bg-white border border-dashed border-[var(--color-border)] text-[var(--color-text-dim)] relative shadow-md">
+          <div className="absolute -top-3 left-4 washi-tape washi-tape-pink rotate-[-5deg]">popped out</div>
+          <p className="text-sm font-medium font-handwritten text-lg text-slate-500">Tiptap editor is in PiP window</p>
+          <PipTrigger className="mt-4 px-4 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-[var(--color-text)] font-handwritten font-bold border-2 border-[var(--color-border)] text-sm shadow-sm transition-all rotate-[2deg] cursor-pointer">
             Return to editor
           </PipTrigger>
         </div>
       }
     >
-      <div className="h-[420px] flex flex-col rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-bg-code)]">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center">
-              <Type size={14} className="text-[var(--color-accent-light)]" />
-            </div>
-            <span className="text-sm font-medium text-white font-sans">Tiptap Editor</span>
-          </div>
-          <PipTrigger
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer border-none bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-dark)] active:scale-98 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
-            openLabel=""
-            closeLabel=""
-            renderOpen={
-              <span className="flex items-center gap-1.5">
-                <ExternalLink size={12} />
-                Pop out
-              </span>
-            }
-            renderClose={
-              <span className="flex items-center gap-1.5">
-                <X size={12} />
-                Close
-              </span>
-            }
-            renderUnsupported={null}
-          />
-        </div>
-
-        {/* Toolbar */}
-        <TiptapToolbar editor={editor} />
-
-        {/* Editor */}
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <EditorContent editor={editor} />
-        </div>
-
-        {/* Status */}
-        <div className="px-4 py-2 border-t border-[var(--color-border)] bg-[var(--color-bg-code)] flex items-center justify-between">
-          <span className="text-[10px] text-[var(--color-text-dim)] font-mono">
-            tiptap + starter-kit
-          </span>
-          <span className="text-[10px] text-[var(--color-text-dim)] font-mono">
-            auto-sizing: active · styles: sync
-          </span>
-        </div>
-      </div>
+      <TiptapDemoContent content={content} onContentChange={setContent} />
     </PipWrapper>
+  );
+}
+
+function TiptapDemoContent({ content, onContentChange }: { content: string; onContentChange: (c: string) => void }) {
+  const { isInsidePip } = usePip();
+
+  return (
+    <div className="h-[420px] flex flex-col border-2 border-[var(--color-border)] bg-white shadow-md relative rotate-[-0.5deg]">
+      {/* Washi tape on top-left of the board */}
+      <div className="absolute -top-4 -left-6 washi-tape washi-tape-green rotate-[-15deg] z-10">TIPTAP</div>
+      
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[var(--color-border)] bg-slate-50">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded bg-[var(--color-border)]/5 flex items-center justify-center border border-[var(--color-border)]">
+            <Type size={14} className="text-[var(--color-text)]" />
+          </div>
+          <span className="text-sm font-bold text-[var(--color-text)] font-handwritten">Tiptap Editor</span>
+        </div>
+        <PipTrigger
+          className="inline-flex items-center gap-1.5 px-3 py-1 font-handwritten text-xs font-bold bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border border-[var(--color-border)] text-[var(--color-text)] shadow-sm hover:scale-105 active:scale-95 transition-all rotate-[1deg] cursor-pointer"
+          openLabel=""
+          closeLabel=""
+          renderOpen={
+            <span className="flex items-center gap-1.5">
+              <ExternalLink size={12} />
+              Pop out
+            </span>
+          }
+          renderClose={
+            <span className="flex items-center gap-1.5">
+              <X size={12} />
+              Close
+            </span>
+          }
+          renderUnsupported={null}
+        />
+      </div>
+
+      {/* Tiptap content wrapped in inner component with key */}
+      <TiptapEditorInner
+        key={isInsidePip ? 'pip' : 'main'}
+        content={content}
+        onContentChange={onContentChange}
+      />
+
+      {/* Status */}
+      <div className="px-4 py-2 border-t border-[var(--color-border-subtle)] bg-slate-50 flex items-center justify-between">
+        <span className="text-[10px] text-[var(--color-text-dim)] font-typewriter">
+          tiptap + starter-kit
+        </span>
+        <span className="text-[10px] text-[var(--color-text-dim)] font-typewriter">
+          auto-sizing: active
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TiptapEditorInner({ content, onContentChange }: { content: string; onContentChange: (c: string) => void }) {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content,
+    editorProps: {
+      attributes: {
+        class: 'tiptap-editor px-4 py-3 outline-none',
+      },
+    },
+    onUpdate({ editor }) {
+      onContentChange(editor.getHTML());
+    },
+  });
+
+  return (
+    <>
+      {/* Toolbar */}
+      <TiptapToolbar editor={editor} />
+
+      {/* Editor (Ruled notebook paper) */}
+      <div className="flex-1 overflow-y-auto min-h-0 notebook-ruled border-b border-[var(--color-border-subtle)]">
+        <EditorContent editor={editor} />
+      </div>
+    </>
   );
 }
 
@@ -183,9 +215,10 @@ function MonacoDemo() {
       copyStyles="sync"
       fallback="none"
       placeholder={
-        <div className="flex flex-col items-center justify-center h-[420px] bg-[var(--color-bg-code)] rounded-lg border border-dashed border-[var(--color-border)] text-[var(--color-text-dim)]">
-          <p className="text-sm font-medium text-[var(--color-text-muted)]">Monaco editor is in PiP</p>
-          <PipTrigger className="mt-4 px-4 py-2 bg-[var(--color-accent)]/15 text-[var(--color-accent-light)] rounded-lg text-xs hover:bg-[var(--color-accent)]/25 cursor-pointer">
+        <div className="flex flex-col items-center justify-center h-[420px] bg-white border border-dashed border-[var(--color-border)] text-[var(--color-text-dim)] relative shadow-md">
+          <div className="absolute -top-3 left-4 washi-tape washi-tape-blue rotate-[4deg]">popped out</div>
+          <p className="text-sm font-medium font-handwritten text-lg text-slate-500">Monaco editor is in PiP window</p>
+          <PipTrigger className="mt-4 px-4 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-[var(--color-text)] font-handwritten font-bold border-2 border-[var(--color-border)] text-sm shadow-sm transition-all rotate-[2deg] cursor-pointer">
             Return to editor
           </PipTrigger>
         </div>
@@ -197,17 +230,20 @@ function MonacoDemo() {
         }, 100);
       }}
     >
-      <div className="h-[420px] flex flex-col rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] overflow-hidden">
+      <div className="h-[420px] flex flex-col border-2 border-[var(--color-border)] bg-white shadow-md relative rotate-[0.5deg]">
+        {/* Washi tape on top-right of the board */}
+        <div className="absolute -top-4 -right-6 washi-tape washi-tape-blue rotate-[12deg] z-10">MONACO</div>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-bg-code)]">
+        <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[var(--color-border)] bg-slate-50">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--color-accent-light)]"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6" /></svg>
+            <div className="w-7 h-7 rounded bg-[var(--color-border)]/5 flex items-center justify-center border border-[var(--color-border)]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--color-text)]"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6" /></svg>
             </div>
-            <span className="text-sm font-medium text-white font-sans">Monaco Editor</span>
+            <span className="text-sm font-bold text-[var(--color-text)] font-handwritten">Monaco Editor</span>
           </div>
           <PipTrigger
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer border-none bg-[var(--color-accent)]/15 text-[var(--color-accent-light)] hover:bg-[var(--color-accent)]/25 active:scale-98 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+            className="inline-flex items-center gap-1.5 px-3 py-1 font-handwritten text-xs font-bold bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border border-[var(--color-border)] text-[var(--color-text)] shadow-sm hover:scale-105 active:scale-95 transition-all rotate-[-1deg] cursor-pointer"
             openLabel=""
             closeLabel=""
             renderOpen={
@@ -226,16 +262,16 @@ function MonacoDemo() {
           />
         </div>
 
-        {/* Monaco editor — lazy-loaded */}
-        <div className="flex-1 min-h-0">
+        {/* Monaco editor — inside a dark block to keep syntax contrast perfect */}
+        <div className="flex-1 min-h-0 bg-[#1e2024] border-b border-[var(--color-border-subtle)]">
           <MonacoEditorLazy />
         </div>
 
         {/* Status */}
-        <div className="px-4 py-2 border-t border-[var(--color-border)] bg-[var(--color-bg-code)] flex items-center justify-between">
-          <span className="text-[10px] text-[var(--color-text-dim)] font-mono">HTML</span>
-          <span className="text-[10px] text-[var(--color-text-dim)] font-mono">
-            auto-sizing: active · resize: event
+        <div className="px-4 py-2 border-t border-[var(--color-border-subtle)] bg-slate-50 flex items-center justify-between">
+          <span className="text-[10px] text-[var(--color-text-dim)] font-typewriter">HTML</span>
+          <span className="text-[10px] text-[var(--color-text-dim)] font-typewriter">
+            auto-sizing: active
           </span>
         </div>
       </div>
@@ -244,48 +280,61 @@ function MonacoDemo() {
 }
 
 export default function EditorDemos() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section id="editor-demos" className="relative py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">
-            Works with{' '}
-            <span className="gradient-text">
-              real editors
-            </span>
+          <h2 className="text-4xl sm:text-5xl font-handwritten font-extrabold mb-4 text-[var(--color-text)]">
+            Works with real editors
           </h2>
-          <p className="text-base text-[var(--color-text-muted)] max-w-xl mx-auto">
+          <p className="text-base font-typewriter text-[var(--color-text-muted)] max-w-xl mx-auto">
             Tiptap, Monaco, CodeMirror — pop out any editor while preserving state, undo history.
           </p>
         </div>
 
-        {/* Demos grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <TiptapDemo />
-            <p className="text-xs text-[var(--color-text-dim)] mt-3 text-center">
-              Rich text — formatting, lists, and blockquotes all survive the pop-out.
-            </p>
+        {/* Demos grid (Rendered only on client to avoid Tiptap/Monaco SSR mismatch) */}
+        {mounted ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+              <TiptapDemo />
+              <p className="text-xs font-typewriter text-[var(--color-text-dim)] mt-3 text-center">
+                Rich text — formatting, lists, and blockquotes all survive the pop-out.
+              </p>
+            </div>
+            <div>
+              <MonacoDemo />
+              <p className="text-xs font-typewriter text-[var(--color-text-dim)] mt-3 text-center">
+                Code editor — onPipWindowReady triggers layout resize handlers.
+              </p>
+            </div>
           </div>
-          <div>
-            <MonacoDemo />
-            <p className="text-xs text-[var(--color-text-dim)] mt-3 text-center">
-              Code editor — <code className="text-[var(--color-text-muted)]">onPipWindowReady</code> triggers <code className="text-[var(--color-text-muted)]">editor.layout()</code>
-            </p>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-pulse">
+            <div className="h-[420px] bg-slate-50 border-2 border-[var(--color-border)] rounded shadow-sm" />
+            <div className="h-[420px] bg-slate-50 border-2 border-[var(--color-border)] rounded shadow-sm" />
           </div>
-        </div>
+        )}
 
         {/* Examples CTA */}
         <div className="mt-16 text-center" data-reveal="">
-          <div className="inline-block p-8 sm:p-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] relative overflow-hidden group max-w-xl mx-auto">
-            <h3 className="text-lg font-bold mb-4 text-white">Want to see more recipes?</h3>
-            <p className="text-sm text-[var(--color-text-muted)] mb-6">
+          <div className="inline-block p-8 sm:p-10 bg-white border-2 border-[var(--color-border)] shadow-md relative rotate-[-1deg] max-w-xl mx-auto">
+            {/* Washi tape pin */}
+            <div className="absolute -top-3 left-[30%] washi-tape washi-tape-yellow rotate-[3deg]">RECIPES</div>
+            
+            <h3 className="text-2xl font-bold font-handwritten mb-4 text-[var(--color-text)]">Want to see more recipes?</h3>
+            <p className="text-sm font-sans text-[var(--color-text-muted)] mb-6">
               We have pre-built examples and detailed recipes for almost every common developer requirement.
             </p>
 
-            {/* Tag chips */}
-            <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-lg mx-auto relative">
+            {/* Tag chips styled as hand-drawn sticky tabs */}
+            <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-lg mx-auto relative font-handwritten">
               {[
                 'Fixed-size PiP',
                 'Portal mode',
@@ -293,19 +342,24 @@ export default function EditorDemos() {
                 'Keyboard shortcuts',
                 'Fallbacks',
                 'Controlled mode',
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 rounded-lg text-[10px] font-semibold bg-[var(--color-bg-code)] border border-[var(--color-border)] text-[var(--color-text-muted)] tracking-wider"
-                >
-                  {tag}
-                </span>
-              ))}
+              ].map((tag, idx) => {
+                const tapes = ['washi-tape-yellow', 'washi-tape-pink', 'washi-tape-green', 'washi-tape-blue', 'washi-tape-orange'];
+                const tapeClass = tapes[idx % tapes.length];
+                const rotate = idx % 2 === 0 ? 'rotate-[-2deg]' : 'rotate-[2deg]';
+                return (
+                  <span
+                    key={tag}
+                    className={`px-3 py-1 font-bold text-xs border border-[var(--color-border)] shadow-sm text-slate-800 ${tapeClass} ${rotate}`}
+                  >
+                    {tag}
+                  </span>
+                );
+              })}
             </div>
 
             <a
               href="/docs"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-white text-xs font-semibold hover:bg-[var(--color-accent-dark)] transition-all active:scale-98 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+              className="inline-flex items-center gap-2 px-5 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border-2 border-[var(--color-border)] text-[var(--color-text)] font-handwritten text-lg font-bold shadow-sm hover:scale-105 active:scale-95 transition-all rotate-[1.5deg]"
             >
               Explore recipes
               <ExternalLink size={14} />

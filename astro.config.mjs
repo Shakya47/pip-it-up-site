@@ -24,5 +24,25 @@ export default defineConfig({
       name: 'JetBrains Mono',
       cssVariable: '--font-jetbrains',
     },
+    {
+      provider: fontProviders.google(),
+      name: 'Gochi Hand',
+      cssVariable: '--font-gochi',
+    },
+    {
+      provider: fontProviders.google(),
+      name: 'Caveat',
+      cssVariable: '--font-caveat',
+    },
+    {
+      provider: fontProviders.google(),
+      name: 'Special Elite',
+      cssVariable: '--font-special-elite',
+    },
+    {
+      provider: fontProviders.google(),
+      name: 'Courier Prime',
+      cssVariable: '--font-courier',
+    },
   ],
 });

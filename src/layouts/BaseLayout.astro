@@ -18,7 +18,7 @@ const ogImage = new URL('/og-image.png', Astro.site);
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -49,6 +49,10 @@ const ogImage = new URL('/og-image.png', Astro.site);
     <!-- Fonts (Astro 6 built-in) -->
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-jetbrains" preload />
+    <Font cssVariable="--font-gochi" preload />
+    <Font cssVariable="--font-caveat" preload />
+    <Font cssVariable="--font-special-elite" preload />
+    <Font cssVariable="--font-courier" preload />
 
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify({
@@ -72,7 +76,7 @@ const ogImage = new URL('/og-image.png', Astro.site);
       "license": "https://opensource.org/licenses/MIT"
     })} />
   </head>
-  <body class="bg-grid min-h-screen pt-16">
+  <body class="min-h-screen pt-16">
     <Navbar />
     <slot />
 

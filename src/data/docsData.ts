@@ -49,8 +49,8 @@ export const docsData: DocCategory[] = [
         content: `
           <p>
             Get started by installing the packages for your stack (view on NPM: 
-            <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" class="text-[var(--color-accent-light)] hover:underline font-mono">@pip-it-up/core</a> and 
-            <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" class="text-[var(--color-accent-light)] hover:underline font-mono">@pip-it-up/react</a>). 
+            <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" class="text-[var(--color-accent-dark)] hover:underline font-mono">@pip-it-up/core</a> and 
+            <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" class="text-[var(--color-accent-dark)] hover:underline font-mono">@pip-it-up/react</a>). 
             We support React and Vanilla JavaScript natively.
           </p>
 
