@@ -41,45 +41,52 @@ function getIcon(support: Support) {
 
 <section id="comparison" class="relative py-24 px-4 sm:px-6">
   <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-12" data-reveal>
-      <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-        How it <span class="gradient-text">compares</span>
+    <div class="text-center mb-16" data-reveal>
+      <h2 class="text-4xl sm:text-5xl font-handwritten font-extrabold mb-4 text-[var(--color-text)]">
+        How it compares
       </h2>
-      <p class="text-lg text-[var(--color-text-muted)] max-w-xl mx-auto">
-        A complete solution — not just a wrapper around the browser API.
+      <p class="text-base sm:text-lg font-typewriter text-[var(--color-text-muted)] max-w-xl mx-auto">
+        A complete solution — if your wrapper exceeds browser API.
       </p>
     </div>
 
-    <div class="glass-card overflow-x-auto" data-reveal>
-      <table class="w-full text-left min-w-[600px]">
-        <thead>
-          <tr class="border-b border-[var(--color-border)]">
-            <th class="px-5 py-4 text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider sticky left-0 bg-[var(--color-bg-card)] z-10">Feature</th>
-            {packages.map((pkg) => (
-              <th class="px-5 py-4 text-center">
-                <a href={pkg.npm} target="_blank" rel="noopener" class="text-sm font-semibold text-white hover:text-[var(--color-accent-light)] transition-colors font-mono">
-                  {pkg.name}
-                </a>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {features.map((feature, i) => (
-            <tr class:list={['transition-colors hover:bg-[var(--color-bg-card-hover)]', i < features.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
-              <td class="px-5 py-3.5 text-sm text-[var(--color-text)] sticky left-0 bg-[var(--color-bg-card)] z-10">{feature}</td>
-              {packages.map((pkg) => {
-                const icon = getIcon(pkg.support[i]);
-                return (
-                  <td class="px-5 py-3.5 text-center">
-                    <span class:list={['font-bold text-lg', icon.class]}>{icon.symbol}</span>
-                  </td>
-                );
-              })}
+    <!-- Taped typewriter comparison sheet -->
+    <div class="bg-white border-2 border-[var(--color-border)] shadow-md p-6 relative rotate-[1deg] font-typewriter" data-reveal>
+      <!-- Washi Tape Accents -->
+      <div class="absolute -top-4 -right-4 washi-tape washi-tape-blue rotate-[12deg] z-10">VS OTHERS</div>
+      <div class="absolute -bottom-4 -left-6 washi-tape washi-tape-blue rotate-[-15deg] z-10">FEATURES</div>
+
+      <div class="overflow-x-auto overflow-y-hidden w-full">
+        <table class="w-full text-left min-w-[600px]">
+          <thead>
+            <tr class="border-b-2 border-[var(--color-border)]">
+              <th class="pb-3 text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-wider sticky left-0 bg-white z-10">Feature</th>
+              {packages.map((pkg) => (
+                <th class="pb-3 text-center">
+                  <a href={pkg.npm} target="_blank" rel="noopener" class="text-sm font-bold text-[var(--color-text)] hover:underline transition-colors">
+                    {pkg.name}
+                  </a>
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {features.map((feature, i) => (
+              <tr class:list={['transition-colors hover:bg-slate-50', i < features.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
+                <td class="py-3 text-sm font-bold text-[var(--color-text)] sticky left-0 bg-white z-10">{feature}</td>
+                {packages.map((pkg) => {
+                  const icon = getIcon(pkg.support[i]);
+                  return (
+                    <td class="py-3 text-center">
+                      <span class:list={['font-bold text-xl', icon.class]}>{icon.symbol}</span>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </section>

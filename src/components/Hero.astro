@@ -1,71 +1,68 @@
 ---
-// Hero section — logo-less, tagline + install + CTAs
+// Hero section — logo-less, tagline + install + CTAs styled as a Scrapbook Zine DIY collage
 ---
 
-<section id="hero" class="relative min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-16 overflow-hidden">
-
+<section id="hero" class="relative min-h-screen flex flex-col items-center justify-center px-4 pt-28 pb-16 overflow-hidden">
   <div class="relative z-10 max-w-4xl mx-auto text-center">
-    <!-- Badge -->
-    <div class="animate-fade-in inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] text-xs text-[var(--color-text-muted)] mb-8 font-medium">
-      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-emerald)]"></span>
-      Active Beta · v0.1.10
-    </div>
-
-    <!-- Title -->
-    <h1 class="animate-fade-in-up text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-white">
-      <span class="gradient-text">pip-it-up</span> <br />
-      <span class="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-text-muted)]">Document Picture-in-Picture</span>
-    </h1>
-
-    <!-- Tagline -->
-    <p class="animate-fade-in-up text-lg sm:text-xl text-[var(--color-text-muted)] max-w-xl mx-auto mb-10 leading-relaxed" style="animation-delay: 0.1s">
-      Pop any UI component into a floating Picture-in-Picture window.
-      <br class="hidden sm:block" />
-      Zero config. Live style sync. Built for modern frameworks.
-    </p>
-
-    <!-- Install command -->
-    <div class="animate-fade-in-up flex flex-col items-center gap-3 mb-10" style="animation-delay: 0.2s">
-      <div id="install-command" class="group relative inline-flex items-center gap-3 px-5 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-code)] font-mono text-sm cursor-pointer hover:border-[var(--color-accent-light)] transition-colors duration-200">
-        <span class="text-[var(--color-text-dim)]">$</span>
-        <span class="text-[var(--color-text)]">npm i @pip-it-up/react</span>
+    
+    <!-- Big Library Title & Yellow Install Note Combo -->
+    <div class="animate-fade-in-up flex flex-col items-center justify-center mb-10 relative">
+      <div class="inline-block relative px-10 py-3 bg-[#d4c5b9] text-[#4a3b32] font-handwritten text-5xl sm:text-6xl md:text-7xl font-bold border-2 border-[#8c7a6b] shadow-sm rotate-[-1.5deg]">
+        <!-- Silver washi tapes on left and right edges -->
+        <div class="absolute -left-7 -top-3 w-12 h-6 bg-[rgba(200,200,200,0.6)] border-x border-dashed border-gray-400 rotate-[-25deg] shadow-sm"></div>
+        <div class="absolute -right-7 -bottom-3 w-12 h-6 bg-[rgba(200,200,200,0.6)] border-x border-dashed border-gray-400 rotate-[25deg] shadow-sm"></div>
+        pip-it-up
+      </div>
+      
+      <!-- Yellow sticky note for install command -->
+      <div 
+        id="install-command" 
+        class="mt-6 sm:mt-0 sm:absolute sm:left-[62%] sm:top-[-25px] cursor-pointer rotate-[6deg] bg-[#fef08a] border border-[#eab308]/40 px-5 py-3 shadow-md flex items-center gap-2.5 group hover:scale-105 active:scale-98 transition-transform z-20"
+        title="Click to copy install command"
+      >
+        <span class="font-mono text-xs font-bold text-[#713f12]">npm i @pip-it-up/react</span>
         <button
           id="copy-install-btn"
-          class="ml-2 p-1 rounded-md hover:bg-[var(--color-bg-elevated)] transition-colors"
+          class="p-0.5 rounded hover:bg-[#fef9c3] transition-colors"
           aria-label="Copy install command"
         >
-          <svg class="w-4 h-4 text-[var(--color-text-muted)] group-hover:text-[var(--color-text)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg class="w-3.5 h-3.5 text-[#a16207]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
           </svg>
         </button>
         <!-- Copied tooltip -->
-        <span id="copy-tooltip" class="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 rounded bg-[var(--color-accent)] text-white text-xs font-medium opacity-0 pointer-events-none transition-opacity duration-150">
+        <span id="copy-tooltip" class="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-[var(--color-border)] text-white text-[10px] font-medium opacity-0 pointer-events-none transition-opacity duration-150">
           Copied!
         </span>
       </div>
-
-      <!-- NPM Links -->
-      <div class="flex items-center gap-3 text-xs text-[var(--color-text-muted)] font-mono">
-        <a href="https://www.npmjs.com/package/@pip-it-up/core" target="_blank" rel="noopener" class="hover:text-[var(--color-accent-light)] transition-colors inline-flex items-center gap-1">
-          @pip-it-up/core <span class="text-[9px] text-[var(--color-text-dim)]">↗</span>
-        </a>
-        <span class="text-[var(--color-text-dim)]">•</span>
-        <a href="https://www.npmjs.com/package/@pip-it-up/react" target="_blank" rel="noopener" class="hover:text-[var(--color-accent-light)] transition-colors inline-flex items-center gap-1">
-          @pip-it-up/react <span class="text-[9px] text-[var(--color-text-dim)]">↗</span>
-        </a>
-      </div>
     </div>
 
-    <!-- CTAs -->
-    <div class="animate-fade-in-up flex flex-col sm:flex-row items-center justify-center gap-4" style="animation-delay: 0.3s">
+    <!-- Main Headline -->
+    <h1 class="animate-fade-in-up font-handwritten text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-8 text-[var(--color-text)]">
+      UI, now Picture-in-Picture.
+    </h1>
+
+    <!-- Tagline / Sub-headline -->
+    <div class="animate-fade-in-up text-center max-w-xl mx-auto mb-10" style="animation-delay: 0.1s">
+      <h2 class="font-handwritten text-2xl sm:text-3xl font-bold text-[var(--color-text-muted)] mb-3">
+        Everything for Picture-in-Picture
+      </h2>
+      <p class="text-sm sm:text-base text-[var(--color-text-muted)] font-typewriter leading-relaxed">
+        Pop Up UI component as a Picture-in-Picture window.<br />
+        Zero config. Live style sync. Built for modern frameworks.
+      </p>
+    </div>
+
+    <!-- CTAs styled as highlighted marker tabs / taped paper elements -->
+    <div class="animate-fade-in-up flex flex-col sm:flex-row items-center justify-center gap-6 mb-12" style="animation-delay: 0.3s">
       <a
         href="/docs"
         id="cta-get-started"
-        class="inline-flex items-center gap-1.5 px-6 py-3 rounded-lg bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] text-white font-medium text-sm transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)] hover:translate-y-[-1px] active:translate-y-[0px]"
+        class="inline-flex items-center gap-1.5 px-6 py-2.5 font-handwritten text-xl font-bold bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border-2 border-[var(--color-border)] text-[var(--color-text)] shadow-sm hover:rotate-1 rotate-[-1.5deg] transition-all hover:scale-105 active:scale-95 duration-100"
       >
         Get Started
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
           <path d="M9 5l7 7-7 7"></path>
         </svg>
       </a>
@@ -74,7 +71,7 @@
         target="_blank"
         rel="noopener noreferrer"
         id="cta-github"
-        class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text)] font-medium text-sm hover:border-[var(--color-text-dim)] hover:bg-[var(--color-bg-card-hover)] transition-all duration-200 hover:translate-y-[-1px] active:translate-y-[0px]"
+        class="inline-flex items-center gap-2 px-6 py-2.5 font-handwritten text-xl font-bold bg-white hover:bg-[var(--color-bg-card-hover)] border-2 border-[var(--color-border)] text-[var(--color-text)] shadow-sm hover:rotate-[-1deg] rotate-[1.5deg] transition-all hover:scale-105 active:scale-95 duration-100"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
