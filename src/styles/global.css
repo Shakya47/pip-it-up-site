@@ -35,6 +35,45 @@
   --color-success: #059669;
   --color-warning: #d97706;
   --color-error: #e11d48;
+
+  /* Ink colour for text sitting ON an accent fill. Stays dark in BOTH themes —
+     the highlighter yellow never darkens enough to carry light text. */
+  --color-on-accent: #22252a;
+
+  /* Paper grain overlay, inverted in dark mode. */
+  --grain-dot: rgba(46, 48, 53, 0.04);
+  --grain-alpha: 0.025;
+
+  /* Sticky-note palette. Six pastels, each with its own ink colour so the note
+     stays legible when the surface flips. */
+  --note-yellow-bg: #fef9c3;  --note-yellow-hover: #fef08a;  --note-yellow-line: #facc15;  --note-yellow-ink: #713f12;
+  --note-pink-bg:   #fce7f3;  --note-pink-hover:   #fbcfe8;  --note-pink-line:   #f472b6;  --note-pink-ink:   #831843;
+  --note-blue-bg:   #dbeafe;  --note-blue-hover:   #bfdbfe;  --note-blue-line:   #60a5fa;  --note-blue-ink:   #1e3a8a;
+  --note-green-bg:  #d1fae5;  --note-green-hover:  #a7f3d0;  --note-green-line:  #34d399;  --note-green-ink:  #065f46;
+  --note-purple-bg: #f3e8ff;  --note-purple-hover: #e9d5ff;  --note-purple-line: #c084fc;  --note-purple-ink: #581c87;
+  --note-cyan-bg:   #ecfeff;  --note-cyan-hover:   #cffafe;  --note-cyan-line:   #22d3ee;  --note-cyan-ink:   #083344;
+
+  /* Surfaces that are literally paper in the light theme. */
+  --paper-white: #ffffff;
+  --paper-edge: #e5e5df;
+  /* Kraft cardboard: the hero title plaque. */
+  --kraft-bg: #d4c5b9;
+  --kraft-line: #8c7a6b;
+  --kraft-ink: #4a3b32;
+  --paper-rule: #e2e8f0;
+  --paper-tractor: #e2e8f0;
+  --paper-tractor-hole: #f1f5f9;
+
+  --tape-ink: rgba(15, 23, 42, 0.7);
+  --tape-blend: multiply;
+
+  --shadow-ink: rgba(46, 48, 53, 0.08);
+  --shadow-ink-strong: rgba(46, 48, 53, 0.12);
+
+  --token-number: #8b5cf6;
+  --alert-note-bg: #fde047;
+  --alert-warn-bg: #f87171;
+  --alert-badge-ink: #22252a;
 }
 
 /* ─── Base Styles ─── */
@@ -53,14 +92,14 @@ body {
   position: relative;
   /* Paper grain/noise texture overlay */
   background-image: 
-    radial-gradient(rgba(46, 48, 53, 0.04) 1px, transparent 1px),
+    radial-gradient(var(--grain-dot) 1px, transparent 1px),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.025 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-size: 24px 24px, auto;
 }
 
 ::selection {
   background-color: var(--color-accent);
-  color: var(--color-text);
+  color: var(--color-on-accent);
 }
 
 /* ─── Scrollbar ─── */
@@ -117,11 +156,11 @@ body {
   border-right: 2px dashed rgba(255,255,255,0.4);
   backdrop-filter: blur(0.5px);
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  mix-blend-mode: multiply;
+  mix-blend-mode: var(--tape-blend);
   padding: 4px 16px;
   font-family: var(--font-handwritten);
   font-size: 0.8rem;
-  color: rgba(15, 23, 42, 0.7);
+  color: var(--tape-ink);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: inline-block;
@@ -169,8 +208,8 @@ body {
 
 /* 4. Polaroid Frames */
 .polaroid-frame {
-  background: #ffffff;
-  border: 1px solid #e5e5df;
+  background: var(--paper-white);
+  border: 1px solid var(--paper-edge);
   padding: 12px 12px 36px 12px;
   box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   transform: rotate(-1deg);
@@ -183,23 +222,23 @@ body {
 
 /* 5. Colorful Sticky Notes */
 .sticky-note {
-  box-shadow: 3px 6px 12px rgba(46, 48, 53, 0.08);
-  border: 1px solid rgba(46, 48, 53, 0.05);
+  box-shadow: 3px 6px 12px var(--shadow-ink);
+  border: 1px solid var(--color-border-subtle);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
 .sticky-note:hover {
   transform: translateY(-4px) rotate(0deg) scale(1.02);
-  box-shadow: 5px 12px 20px rgba(46, 48, 53, 0.12);
+  box-shadow: 5px 12px 20px var(--shadow-ink-strong);
   z-index: 10;
 }
 
 /* 6. Dot-matrix printer paper */
 .dot-matrix-paper {
-  background-color: #fbfcfa;
+  background-color: var(--paper-white);
   background-image: linear-gradient(rgba(110, 231, 183, 0.03) 50%, transparent 50%);
   background-size: 100% 48px;
-  border-left: 20px solid #e2e8f0;
-  border-right: 20px solid #e2e8f0;
+  border-left: 20px solid var(--paper-tractor);
+  border-right: 20px solid var(--paper-tractor);
   border-top: 2px dashed var(--color-border-subtle);
   border-bottom: 2px dashed var(--color-border-subtle);
   position: relative;
@@ -211,7 +250,7 @@ body {
   top: 0;
   bottom: 0;
   width: 8px;
-  background-image: radial-gradient(circle, #f1f5f9 3px, transparent 4px);
+  background-image: radial-gradient(circle, var(--paper-tractor-hole) 3px, transparent 4px);
   background-size: 8px 24px;
   background-position: center;
 }
@@ -229,8 +268,8 @@ body {
 
 /* 8. Ruled Notebook paper */
 .notebook-ruled {
-  background-color: #ffffff;
-  background-image: linear-gradient(#e2e8f0 1px, transparent 1px);
+  background-color: var(--paper-white);
+  background-image: linear-gradient(var(--paper-rule) 1px, transparent 1px);
   background-size: 100% 24px;
   line-height: 24px;
 }
@@ -374,7 +413,7 @@ body {
 .token-comment { color: var(--color-text-dim); font-style: italic; }
 .token-tag { color: var(--color-cyan); font-weight: 500; }
 .token-attr { color: var(--color-amber); }
-.token-number { color: #8b5cf6; }
+.token-number { color: var(--token-number); }
 .token-plain { color: var(--color-text); }
 
 /* ─── Docs Content Markup Styles ─── */
@@ -481,7 +520,7 @@ body {
 }
 
 .docs-content tr:hover td {
-  background: rgba(46, 48, 53, 0.02);
+  background: var(--color-bg-elevated);
 }
 
 .docs-content .alert {
@@ -505,9 +544,9 @@ body {
   position: absolute;
   top: -12px;
   left: 12px;
-  background: #fde047;
+  background: var(--alert-note-bg);
   border: 2px solid var(--color-border);
-  color: var(--color-text);
+  color: var(--alert-badge-ink);
   font-family: var(--font-handwritten);
   font-size: 0.75rem;
   font-weight: bold;
@@ -523,9 +562,9 @@ body {
   position: absolute;
   top: -12px;
   left: 12px;
-  background: #f87171;
+  background: var(--alert-warn-bg);
   border: 2px solid var(--color-border);
-  color: var(--color-text);
+  color: var(--alert-badge-ink);
   font-family: var(--font-handwritten);
   font-size: 0.75rem;
   font-weight: bold;
@@ -534,3 +573,138 @@ body {
 
 
 
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DARK MODE — "chalk on dark craft card"
+   ──────────────────────────────────────────────────────────────────────────
+   The light theme is dark ink on cream paper. The honest inversion is not
+   "grey everything", it is the same zine drawn in chalk on dark card stock.
+   So `--color-border` flips from near-black ink to warm chalk: every 2px
+   sketch border and `2px 2px 0` hard shadow keeps reading as a drawn line
+   instead of vanishing into the background.
+
+   The ground is warm (#1b1a19), not blue-black, because the light theme's
+   paper is warm (#f5f4ef). A cool grey dark mode would read as a different
+   product. Accents shift warmer and lighter to survive the dark ground.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+html.dark {
+  --color-bg: #1b1a19;
+  --color-bg-card: #242322;
+  --color-bg-card-hover: #2b2a28;
+  --color-bg-code: #151413;
+  --color-bg-elevated: #201f1e;
+
+  --color-text: #f0ece3;
+  --color-text-muted: #c8c2b6;
+  --color-text-dim: #968f82;
+
+  /* The inversion that keeps the hand-drawn look alive. */
+  --color-border: #e8e2d6;
+  --color-border-subtle: #3b3936;
+
+  --color-accent: #fbbf24;
+  --color-accent-light: #fcd34d;
+  --color-accent-dark: #fde68a;
+  --color-accent-glow: rgba(251, 191, 36, 0.14);
+
+  --color-cyan: #22d3ee;
+  --color-emerald: #34d399;
+  --color-amber: #fbbf24;
+  --color-rose: #fb7185;
+
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #fb7185;
+
+  /* Yellow highlighter still needs dark ink on top, in either theme. */
+  --color-on-accent: #22252a;
+
+  --grain-dot: rgba(240, 236, 227, 0.035);
+  --grain-alpha: 0.045;
+
+  /* Deep tinted card stock, light tinted ink. Each pair clears 7:1. */
+  --note-yellow-bg: #3a3016;  --note-yellow-hover: #473a1b;  --note-yellow-line: #a3810f;  --note-yellow-ink: #fde68a;
+  --note-pink-bg:   #3d1f2e;  --note-pink-hover:   #4a2537;  --note-pink-line:   #b3487c;  --note-pink-ink:   #fbcfe8;
+  --note-blue-bg:   #1c2b45;  --note-blue-hover:   #223353;  --note-blue-line:   #4a7fc4;  --note-blue-ink:   #bfdbfe;
+  --note-green-bg:  #16332a;  --note-green-hover:  #1b3e33;  --note-green-line:  #2f8f6d;  --note-green-ink:  #a7f3d0;
+  --note-purple-bg: #2e2140;  --note-purple-hover: #372850;  --note-purple-line: #8b5fc0;  --note-purple-ink: #e9d5ff;
+  --note-cyan-bg:   #12303a;  --note-cyan-hover:   #163a46;  --note-cyan-line:   #1b93ad;  --note-cyan-ink:   #a5f3fc;
+
+  --paper-white: #242322;
+  --paper-edge: #3b3936;
+  --paper-rule: #302e2b;
+  --paper-tractor: #302e2b;
+  --paper-tractor-hole: #1b1a19;
+  --kraft-bg: #3a322c;
+  --kraft-line: #7d6d5d;
+  --kraft-ink: #ecdfd0;
+
+  --tape-ink: rgba(245, 242, 235, 0.82);
+  /* `multiply` turns every tape strip black on a dark ground. `screen` keeps
+     the translucent-tape read instead of erasing it. */
+  --tape-blend: screen;
+
+  --shadow-ink: rgba(0, 0, 0, 0.5);
+  --shadow-ink-strong: rgba(0, 0, 0, 0.65);
+
+  --token-number: #c4b5fd;
+  --alert-note-bg: #fde047;
+  --alert-warn-bg: #fb7185;
+  --alert-badge-ink: #22252a;
+
+  color-scheme: dark;
+}
+
+/* Follow the OS when the visitor has expressed no preference of their own. */
+@media (prefers-color-scheme: dark) {
+  html:not(.light):not(.dark) {
+    --color-bg: #1b1a19;
+    --color-bg-card: #242322;
+    --color-bg-card-hover: #2b2a28;
+    --color-bg-code: #151413;
+    --color-bg-elevated: #201f1e;
+    --color-text: #f0ece3;
+    --color-text-muted: #c8c2b6;
+    --color-text-dim: #968f82;
+    --color-border: #e8e2d6;
+    --color-border-subtle: #3b3936;
+    --color-accent: #fbbf24;
+    --color-accent-light: #fcd34d;
+    --color-accent-dark: #fde68a;
+    --color-accent-glow: rgba(251, 191, 36, 0.14);
+    --color-cyan: #22d3ee;
+    --color-emerald: #34d399;
+    --color-amber: #fbbf24;
+    --color-rose: #fb7185;
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-error: #fb7185;
+    --grain-dot: rgba(240, 236, 227, 0.035);
+    --grain-alpha: 0.045;
+    --note-yellow-bg: #3a3016;  --note-yellow-hover: #473a1b;  --note-yellow-line: #a3810f;  --note-yellow-ink: #fde68a;
+    --note-pink-bg:   #3d1f2e;  --note-pink-hover:   #4a2537;  --note-pink-line:   #b3487c;  --note-pink-ink:   #fbcfe8;
+    --note-blue-bg:   #1c2b45;  --note-blue-hover:   #223353;  --note-blue-line:   #4a7fc4;  --note-blue-ink:   #bfdbfe;
+    --note-green-bg:  #16332a;  --note-green-hover:  #1b3e33;  --note-green-line:  #2f8f6d;  --note-green-ink:  #a7f3d0;
+    --note-purple-bg: #2e2140;  --note-purple-hover: #372850;  --note-purple-line: #8b5fc0;  --note-purple-ink: #e9d5ff;
+    --note-cyan-bg:   #12303a;  --note-cyan-hover:   #163a46;  --note-cyan-line:   #1b93ad;  --note-cyan-ink:   #a5f3fc;
+    --paper-white: #242322;
+    --paper-edge: #3b3936;
+    --paper-rule: #302e2b;
+    --paper-tractor: #302e2b;
+    --paper-tractor-hole: #1b1a19;
+    --kraft-bg: #3a322c;
+    --kraft-line: #7d6d5d;
+    --kraft-ink: #ecdfd0;
+    --tape-ink: rgba(245, 242, 235, 0.82);
+    --tape-blend: screen;
+    --shadow-ink: rgba(0, 0, 0, 0.5);
+    --shadow-ink-strong: rgba(0, 0, 0, 0.65);
+    --token-number: #c4b5fd;
+    --alert-note-bg: #fde047;
+    --alert-warn-bg: #fb7185;
+    --alert-badge-ink: #22252a;
+    --color-on-accent: #22252a;
+    color-scheme: dark;
+  }
+}

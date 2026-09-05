@@ -1,14 +1,19 @@
 ---
 // Navbar - Styled as a ripped notebook paper strip pinned with a red thumbtack
+import pkg from '../../package.json';
+import ThemeToggle from './ThemeToggle.astro';
+
+// Single-sourced from the dependency range so the badge can never drift from what ships.
+const version = pkg.dependencies['@pip-it-up/react'].replace(/^[\^~]/, '');
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-white ripped-paper-bottom shadow-md border-none">
+<header class="fixed top-0 left-0 right-0 z-50 bg-[var(--paper-white)] ripped-paper-bottom shadow-md border-none">
   <!-- Pinned torn notebook paper strip inside container -->
   <div class="relative max-w-5xl mx-auto px-4 sm:px-6 pt-3 pb-5 flex items-center justify-between">
     <!-- Logo/Brand -->
     <a href="/" class="flex items-center gap-2 group relative">
       <span class="text-2xl font-bold tracking-tight text-[var(--color-text)] font-handwritten hover:text-[var(--color-accent-dark)] transition-colors rotate-[-1deg]">pip-it-up</span>
-      <span class="text-[9px] px-1.5 py-0.5 rounded border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-muted)] font-bold font-mono">v0.1.10</span>
+      <span class="text-[9px] px-1.5 py-0.5 rounded border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-muted)] font-bold font-mono">v{version}</span>
     </a>
 
     <!-- Desktop Navigation -->
@@ -25,7 +30,8 @@
     </nav>
 
     <!-- Actions -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3 sm:gap-4">
+      <ThemeToggle />
       <a 
         href="https://github.com/Shakya47/pip-it-up" 
         target="_blank" 
@@ -37,7 +43,7 @@
       </a>
       <a 
         href="/docs" 
-        class="inline-flex items-center justify-center px-4 py-1 font-handwritten text-lg font-bold bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border-2 border-[var(--color-border)] text-[var(--color-text)] shadow-sm hover:rotate-2 rotate-[-1deg] transition-all hover:scale-105 active:scale-95 duration-100"
+        class="inline-flex items-center justify-center px-4 py-1 font-handwritten text-lg font-bold bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border-2 border-[var(--color-border)] text-[var(--color-on-accent)] shadow-sm hover:rotate-2 rotate-[-1deg] transition-all hover:scale-105 active:scale-95 duration-100"
       >
         Get Started
       </a>

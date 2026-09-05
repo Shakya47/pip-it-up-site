@@ -51,7 +51,7 @@ function getIcon(support: Support) {
     </div>
 
     <!-- Taped typewriter comparison sheet -->
-    <div class="bg-white border-2 border-[var(--color-border)] shadow-md p-6 relative rotate-[1deg] font-typewriter" data-reveal>
+    <div class="bg-[var(--paper-white)] border-2 border-[var(--color-border)] shadow-md p-6 relative rotate-[1deg] font-typewriter" data-reveal>
       <!-- Washi Tape Accents -->
       <div class="absolute -top-4 -right-4 washi-tape washi-tape-blue rotate-[12deg] z-10">VS OTHERS</div>
       <div class="absolute -bottom-4 -left-6 washi-tape washi-tape-blue rotate-[-15deg] z-10">FEATURES</div>
@@ -60,7 +60,7 @@ function getIcon(support: Support) {
         <table class="w-full text-left min-w-[600px]">
           <thead>
             <tr class="border-b-2 border-[var(--color-border)]">
-              <th class="pb-3 text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-wider sticky left-0 bg-white z-10">Feature</th>
+              <th class="pb-3 text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-wider sticky left-0 bg-[var(--paper-white)] z-10">Feature</th>
               {packages.map((pkg) => (
                 <th class="pb-3 text-center">
                   <a href={pkg.npm} target="_blank" rel="noopener" class="text-sm font-bold text-[var(--color-text)] hover:underline transition-colors">
@@ -72,8 +72,8 @@ function getIcon(support: Support) {
           </thead>
           <tbody>
             {features.map((feature, i) => (
-              <tr class:list={['transition-colors hover:bg-slate-50', i < features.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
-                <td class="py-3 text-sm font-bold text-[var(--color-text)] sticky left-0 bg-white z-10">{feature}</td>
+              <tr class:list={['transition-colors hover:bg-[var(--color-bg-elevated)]', i < features.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
+                <td class="py-3 text-sm font-bold text-[var(--color-text)] sticky left-0 bg-[var(--paper-white)] z-10">{feature}</td>
                 {packages.map((pkg) => {
                   const icon = getIcon(pkg.support[i]);
                   return (
