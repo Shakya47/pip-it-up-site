@@ -20,7 +20,7 @@ const browsers = [
     </div>
 
     <!-- Taped typewriter sheet container -->
-    <div class="bg-white border-2 border-[var(--color-border)] shadow-md p-6 sm:p-8 max-w-2xl mx-auto relative rotate-[-1deg] font-typewriter" data-reveal>
+    <div class="bg-[var(--paper-white)] border-2 border-[var(--color-border)] shadow-md p-6 sm:p-8 max-w-2xl mx-auto relative rotate-[-1deg] font-typewriter" data-reveal>
       <!-- Blue Washi Tapes on corners -->
       <div class="absolute -top-4 -left-6 washi-tape washi-tape-blue rotate-[-15deg] z-10">COMPATIBILITY</div>
       <div class="absolute -bottom-4 -right-4 washi-tape washi-tape-blue rotate-[12deg] z-10">SECURE</div>
@@ -35,18 +35,18 @@ const browsers = [
         </thead>
         <tbody>
           {browsers.map((browser, i) => (
-            <tr class:list={['transition-colors hover:bg-slate-50', i < browsers.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
+            <tr class:list={['transition-colors hover:bg-[var(--color-bg-elevated)]', i < browsers.length - 1 && 'border-b border-[var(--color-border-subtle)]']}>
               <td class="py-4">
                 <span class="text-base font-bold text-[var(--color-text)]">{browser.name}</span>
               </td>
               <td class="py-4 text-[var(--color-text-muted)] text-sm">{browser.version}</td>
               <td class="py-4">
                 {browser.supported ? (
-                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded border border-emerald-600 bg-[#d1fae5] text-[#065f46] text-xs font-bold font-sans">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded border border-emerald-600 bg-[var(--note-green-bg)] text-[var(--note-green-ink)] text-xs font-bold font-sans">
                     ✓ Full Support
                   </span>
                 ) : (
-                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded border border-amber-500 bg-[#fef3c7] text-[#92400e] text-xs font-bold font-sans">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded border border-[var(--note-yellow-line)] bg-[var(--note-yellow-bg)] text-[var(--note-yellow-ink)] text-xs font-bold font-sans">
                     ⚠ {browser.note}
                   </span>
                 )}

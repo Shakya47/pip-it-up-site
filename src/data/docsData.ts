@@ -20,7 +20,7 @@ export const docsData: DocCategory[] = [
       {
         id: 'introduction',
         title: 'Introduction',
-        keywords: ['pip', 'document picture-in-picture', 'floating window', 'dom moving', 'features', 'browser support'],
+        keywords: ['pip', 'document picture-in-picture', 'floating window', 'dom moving', 'features', 'browser support', 'route persistent', 'zero remount', 'auto pip'],
         summary: 'Learn about pip-it-up, the ultimate Document Picture-in-Picture toolkit for the web.',
         content: `
           <p>
@@ -34,6 +34,9 @@ export const docsData: DocCategory[] = [
             <li><strong>State Preservation:</strong> Physically relocates your live DOM element, preserving internal state (scroll position, text selections, input cursor, audio/video playheads) and event listeners perfectly.</li>
             <li><strong>Dynamic Style Sync:</strong> Automatically mirrors your document's stylesheets (including Tailwind CSS and CSS-in-JS rules) and syncs additions in real-time.</li>
             <li><strong>Graceful Fallbacks:</strong> Degrades smoothly to browser popups, modal views, or classic Video PiP on unsupported browsers (Safari, Firefox, and mobile devices).</li>
+            <li><strong>Zero Remounts:</strong> Content is moved, never recreated. Playheads, canvas bitmaps, WebGL contexts and component state survive every transition.</li>
+            <li><strong>Route Persistence:</strong> <code>PipProvider</code> and <code>PipAnchor</code> keep a floating window alive across navigation, docking it into whichever route is on screen.</li>
+            <li><strong>Automatic PiP:</strong> <code>useAutoPip</code> pops out the moment the tab is hidden, reporting whether a user gesture or the browser authorised it.</li>
           </ul>
 
           <div class="alert alert-info">
@@ -97,7 +100,65 @@ document.getElementById('btn-open').addEventListener('click', () => {
   pip.open({ contentEl, originEl });
 });</code></pre>
         `
-      }
+      },
+      {
+        id: 'upgrading',
+        title: 'Upgrading to 0.2.0',
+        keywords: ['upgrade', 'migration', 'breaking changes', '0.2.0', 'changelog', 'behaviour change'],
+        summary: 'What changed between 0.1.x and 0.2.0, and the two behaviours that can bite on upgrade.',
+        content: `
+          <p>
+            0.2.0 is additive for most codebases — existing <code>createPip</code> and
+            <code>&lt;PipWrapper&gt;</code> usage keeps working. Two behaviour changes are worth checking
+            before you upgrade.
+          </p>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>npm i @pip-it-up/core@^0.2.0 @pip-it-up/react@^0.2.0</code></pre>
+
+          <h3>Behaviour changes</h3>
+          <div class="alert alert-warning">
+            <strong>1. The origin element now generates a layout box.</strong>
+            <code>&lt;PipWrapper&gt;</code>'s origin is <code>position: relative</code> instead of
+            <code>display: contents</code>. This is what makes size reservation and placeholder positioning
+            possible. If your layout assumed the wrapper was invisible to flex or grid, add compensating
+            styles.
+          </div>
+          <div class="alert alert-warning">
+            <strong>2. <code>undefined</code> no longer wipes an element slot.</strong>
+            <code>setDefaultElements({ contentEl: undefined })</code> is now a no-op. Pass <code>null</code>
+            to vacate a slot explicitly. <code>updateOptions()</code> follows the same rule, so partial
+            updates are safe.
+          </div>
+
+          <h3>New in core</h3>
+          <ul>
+            <li><code>createAutoPip</code> and <code>registerEnterPipAction</code> — automatic PiP on tab switch.</li>
+            <li><code>registerElements</code>, <code>getDefaultElements</code>, <code>subscribeElements</code> — tri-state slots with compare-and-clear handles.</li>
+            <li><code>registerTeardown</code> — synchronous hooks that run before the PiP window dies.</li>
+            <li><code>destroy()</code> is terminal, exposing <code>instance.signal</code> and <code>instance.destroyed</code>.</li>
+            <li><code>unregisterPip(id, instance)</code> is compare-and-delete.</li>
+          </ul>
+
+          <h3>New in react</h3>
+          <ul>
+            <li><code>&lt;PipProvider&gt;</code> and <code>&lt;PipAnchor&gt;</code> — route-persistent PiP.</li>
+            <li><code>useAutoPip</code> — automatic PiP as a hook.</li>
+            <li><code>useDormancy</code>, <code>useActiveEffect</code>, <code>useRevealEffect</code>, <code>useAdaptiveInterval</code>.</li>
+            <li><code>&lt;PipWrapper&gt;</code> no longer remounts its subtree on open or close.</li>
+          </ul>
+
+          <h3>Removed</h3>
+          <ul>
+            <li>The internal <code>PipPortal</code> component. It was never exported, so this affects nobody importing from the package entry point.</li>
+          </ul>
+
+          <div class="alert alert-info">
+            <strong>Security fixes included.</strong> <code>fallbackUrl</code> now navigates to the parsed,
+            validated URL rather than the raw input, closing a <code>&lt;base href&gt;</code> resolution
+            differential. Bridged pointer events carry a non-enumerable <code>pipItUpBridged</code> marker.
+          </div>
+        `
+      },
     ]
   },
   {
@@ -215,7 +276,173 @@ document.getElementById('nav-toggle-btn').addEventListener('click', () => {
   getPip('main-player')?.close();
 });</code></pre>
         `
-      }
+      },
+      {
+        id: 'auto-pip',
+        title: 'Automatic PiP',
+        keywords: ['auto pip', 'createAutoPip', 'tab switch', 'visibilitychange', 'media session', 'transient activation', 'enterpictureinpicture'],
+        summary: 'Open Picture-in-Picture automatically when the user switches tabs, and understand why an attempt can be refused.',
+        content: `
+          <p>
+            <code>createAutoPip(enter, options?)</code> enters Picture-in-Picture when the document becomes
+            hidden. It is framework-agnostic and returns a disposer. You supply <code>enter</code>, so the
+            same helper drives native Video PiP or full Document PiP — the helper owns <em>when</em>, you own
+            <em>what</em>.
+          </p>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { createAutoPip } from '@pip-it-up/core';
+
+const dispose = createAutoPip(() =&gt; instance.open(), {
+  when: () =&gt; !video.paused,
+  onResult: (r) =&gt; console.warn('auto-pip', r),
+});
+
+// later
+dispose();</code></pre>
+
+          <h3>Options</h3>
+          <table>
+            <thead><tr><th>Option</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>when</code></td><td><code>() =&gt; boolean</code></td><td>Guard evaluated at attempt time. Return <code>false</code> to skip. Defaults to always attempting.</td></tr>
+              <tr><td><code>onResult</code></td><td><code>(r: AutoPipResult) =&gt; void</code></td><td>Reports every attempt, including expected rejections.</td></tr>
+              <tr><td><code>mediaSession</code></td><td><code>boolean</code></td><td>Also register the <code>enterpictureinpicture</code> Media Session action. Default <code>false</code>.</td></tr>
+              <tr><td><code>signal</code></td><td><code>AbortSignal</code></td><td>Stop listening when aborted, instead of tracking the disposer. Chain <code>instance.signal</code> here.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Reading AutoPipResult</h3>
+          <p>The result separates "nothing authorised this" from a real failure:</p>
+          <ul>
+            <li><code>{ ok: true, grantedBy: 'gesture' }</code> — a live transient user activation paid for the call.</li>
+            <li><code>{ ok: true, grantedBy: 'browser' }</code> — no activation was live; the browser granted PiP itself on an eligible origin.</li>
+            <li><code>{ ok: false, error, hadActivation }</code> — refused. <code>hadActivation: false</code> with a <code>NotAllowedError</code> is the ordinary outcome on an untouched page. <code>true</code> means the gesture was accepted and the failure came from elsewhere.</li>
+          </ul>
+
+          <div class="alert alert-warning">
+            <strong>One attempt per gesture.</strong> Transient activation is time-based and survives across
+            tasks, but a successful call <em>consumes</em> it. If two components enable auto-PiP, a single tab
+            switch carries one activation: exactly one wins and the other is rejected with
+            <code>NotAllowedError</code>. Worse, the two trigger paths order themselves in opposite directions —
+            <code>visibilitychange</code> fires every listener so the <em>first</em> registered wins, while
+            <code>enterpictureinpicture</code> has one global handler slot so the <em>last</em> registered wins.
+            That makes the outcome depend on JSX order. Arbitrate explicitly with <code>when</code> instead.
+          </div>
+
+          <h3>registerEnterPipAction(enter)</h3>
+          <p>
+            Registers the <code>enterpictureinpicture</code> Media Session action on its own — the page-side
+            opt-in that lets Chrome trigger PiP with no user gesture on eligible origins. Only meaningful
+            while media is playing, and there is one Media Session per document, so call it from a single owner.
+          </p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { registerEnterPipAction } from '@pip-it-up/core';
+
+const unregister = registerEnterPipAction(() =&gt; instance.open());</code></pre>
+        `
+      },
+      {
+        id: 'element-registration',
+        title: 'Element Registration',
+        keywords: ['registerElements', 'tri-state', 'compare-and-clear', 'setDefaultElements', 'getDefaultElements', 'subscribeElements', 'contentEl', 'originEl'],
+        summary: 'Tri-state element slots with compare-and-clear handles, for components that hand ownership to each other.',
+        content: `
+          <p>
+            An instance holds two element slots, <code>contentEl</code> and <code>originEl</code>.
+            <code>registerElements(patch)</code> claims them and returns a handle that only ever releases what
+            it still owns — which is what makes a route handoff safe in either commit order.
+          </p>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>const reg = instance.registerElements({ originEl: node });
+
+reg.update({ originEl: newNode }); // re-point
+reg.release();                     // vacate only slots this handle still owns
+reg.released;                      // true afterwards; further update() is inert</code></pre>
+
+          <h3>Tri-state slots</h3>
+          <p>Each slot in a patch distinguishes three intents:</p>
+          <table>
+            <thead><tr><th>Value</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>undefined</code> (or key absent)</td><td>Leave the slot alone. Never clobbers a sibling.</td></tr>
+              <tr><td><code>null</code></td><td>Vacate the slot explicitly.</td></tr>
+              <tr><td><code>HTMLElement</code></td><td>Claim the slot.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-warning">
+            <strong>Behaviour change in 0.2.0.</strong> <code>setDefaultElements({ contentEl: undefined })</code>
+            is now a no-op rather than a wipe. Pass <code>null</code> to vacate a slot. Likewise
+            <code>updateOptions()</code> no longer overwrites stored options with <code>undefined</code>, so
+            partial updates are safe.
+          </div>
+
+          <h3>Reading slots</h3>
+          <ul>
+            <li><code>getDefaultElements()</code> — referentially stable. A no-op merge returns the <em>same object</em>, so it is safe as a <code>useSyncExternalStore</code> snapshot without causing render loops.</li>
+            <li><code>subscribeElements(fn)</code> — fires only on real slot changes. Narrower than <code>subscribe</code>, which fires on every state change.</li>
+          </ul>
+
+          <div class="alert alert-info">
+            <strong>Clearing a slot is not a close signal.</strong> Calling
+            <code>setDefaultElements({ contentEl: null, originEl: null })</code> while open leaves
+            <code>isOpen === true</code>, and removing the origin node from the DOM neither throws nor
+            auto-closes the window.
+          </div>
+        `
+      },
+      {
+        id: 'lifecycle-teardown',
+        title: 'Lifecycle & Teardown',
+        keywords: ['registerTeardown', 'destroy', 'signal', 'destroyed', 'abortsignal', 'repatriation', 'pagehide'],
+        summary: 'Synchronous teardown hooks and a terminal destroy(), for moving DOM out before the PiP window dies.',
+        content: `
+          <p>
+            When a PiP window closes, its document is torn down. Anything you still have parented inside it
+            must be moved out <em>synchronously</em> — an async callback runs too late, after the nodes are
+            already gone. <code>registerTeardown</code> exists for exactly that window.
+          </p>
+
+          <h3>registerTeardown(fn)</h3>
+          <p>
+            Runs synchronously at the very top of <code>close()</code>, LIFO, before
+            <code>pipWindow.close()</code> and before internal cleanup. Returns an idempotent unregister
+            function.
+          </p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>const off = instance.registerTeardown((pipWindow) =&gt; {
+  // still alive here - move your nodes home
+  anchor.appendChild(node);
+});</code></pre>
+          <p>
+            Hooks are error-isolated: a throwing hook is reported via <code>console.error</code>, the
+            remaining hooks still run, the window still closes, and the instance is left reopenable.
+          </p>
+
+          <h3>destroy() is terminal</h3>
+          <ul>
+            <li>Aborts <code>instance.signal</code>, so every signal-bound listener is removed atomically.</li>
+            <li>Sets <code>instance.destroyed === true</code>. Every mutating method is inert afterwards.</li>
+            <li>Releases retained DOM references and clears listener sets.</li>
+            <li>Closes the window if it was open, running teardown hooks first.</li>
+          </ul>
+
+          <h3>instance.signal</h3>
+          <p>
+            An <code>AbortSignal</code> aborted by <code>destroy()</code>. Bind listeners to it rather than
+            tracking disposers by hand — the browser removes signal-bound listeners even if one of your own
+            disposers throws first:
+          </p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>window.addEventListener('resize', onResize, { signal: instance.signal });
+
+// chain it into other lifetimes too
+createAutoPip(enter, { signal: instance.signal });</code></pre>
+
+          <div class="alert alert-info">
+            <strong>Registry safety.</strong> <code>unregisterPip(id, instance)</code> is now
+            compare-and-delete: passing the instance means an outgoing component's cleanup can no longer
+            remove an incoming component's registration.
+          </div>
+        `
+      },
     ]
   },
   {
@@ -230,6 +457,13 @@ document.getElementById('nav-toggle-btn').addEventListener('click', () => {
         content: `
           <p>React handles styling, portals, and unmount triggers through structured wrappers.</p>
 
+          <div class="alert alert-info">
+            <strong>Zero remounts since 0.2.0.</strong> <code>&lt;PipWrapper&gt;</code> no longer remounts its
+            subtree when the PiP window opens or closes. Video playheads, canvas bitmaps, WebGL contexts,
+            WebRTC streams and component state are all preserved — the content lives in an immortal portal
+            container that is moved with native DOM APIs rather than torn down and rebuilt.
+          </div>
+
           <h3>&lt;PipWrapper&gt;</h3>
           <p>Props include all standard core options along with specific React attributes:</p>
           <ul>
@@ -237,6 +471,13 @@ document.getElementById('nav-toggle-btn').addEventListener('click', () => {
             <li><code>placeholder</code>: A React Node rendered inline in the layout while children reside inside the PiP portal.</li>
             <li><code>centerInPip</code>: Flex centering utility styles inside the PiP body.</li>
           </ul>
+
+          <div class="alert alert-warning">
+            <strong>Layout change in 0.2.0.</strong> The origin element is now
+            <code>position: relative</code> instead of <code>display: contents</code>, so it generates a real
+            layout box. This is required for size reservation and placeholder positioning. If you were relying
+            on the wrapper being layout-invisible, add your own styles to compensate.
+          </div>
 
           <h4>Controlled Example</h4>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>const [isFloating, setIsFloating] = useState(false);
@@ -267,7 +508,7 @@ return (
       {
         id: 'react-hooks',
         title: 'React Hooks',
-        keywords: ['usepip', 'useispipsupported', 'usevideopip', 'hooks'],
+        keywords: ['usepip', 'useispipsupported', 'usevideopip', 'useautopip', 'auto pip', 'hooks'],
         summary: 'Accessing the active Picture-in-Picture state inside React functional components.',
         content: `
           <p>Hook integrations let you query support values and read the active window context.</p>
@@ -303,8 +544,156 @@ function CustomVideo() {
     &lt;/div&gt;
   );
 }</code></pre>
+
+          <h3>useAutoPip(enter, options?)</h3>
+          <p>
+            Enters Picture-in-Picture automatically when the tab is hidden. Always on unless you pass
+            <code>enabled: false</code>. <code>enter</code> is read through a ref, so passing a fresh inline
+            arrow every render never detaches the listener.
+          </p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { useVideoPip, useAutoPip } from '@pip-it-up/react';
+
+function Player() {
+  const videoRef = useRef(null);
+  const { enter } = useVideoPip(videoRef);
+
+  useAutoPip(enter, {
+    when: () =&gt; !videoRef.current?.paused,
+    onResult: (r) =&gt; !r.ok &amp;&amp; console.warn(r.error),
+  });
+
+  return &lt;video ref={videoRef} src="movie.mp4" controls playsInline /&gt;;
+}</code></pre>
+          <p>
+            It accepts every <code>createAutoPip</code> option plus <code>enabled</code>. See
+            <strong>Automatic PiP</strong> in the Core API for why an attempt can be refused and what
+            <code>onResult</code> reports.
+          </p>
         `
-      }
+      },
+      {
+        id: 'route-persistent',
+        title: 'Route-Persistent PiP',
+        keywords: ['pipprovider', 'pipanchor', 'route persistent', 'navigation', 'teleport', 'zero remount', 'garage', 'layout shift', 'cls'],
+        summary: 'Keep a PiP window alive across route changes with PipProvider and PipAnchor — zero unmounts, zero layout shift.',
+        content: `
+          <p>
+            A component that lives inside a route unmounts when you navigate away, taking its PiP window with
+            it. <code>&lt;PipProvider&gt;</code> solves that by hosting the content <em>above</em> the router and
+            letting each route dock it through a <code>&lt;PipAnchor&gt;</code>. The DOM node is moved between
+            anchors, never recreated.
+          </p>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { PipProvider, PipAnchor } from '@pip-it-up/react';
+
+function App() {
+  return (
+    &lt;PipProvider registry={{ player: &lt;VideoPlayer /&gt; }}&gt;
+      &lt;Routes /&gt;
+    &lt;/PipProvider&gt;
+  );
+}
+
+// any route
+function Dashboard() {
+  return &lt;PipAnchor id="player" className="w-full aspect-video" /&gt;;
+}</code></pre>
+
+          <h3>How it works</h3>
+          <ul>
+            <li>Each registry id gets one <strong>immortal portal container</strong> ("shuttle"), created once.</li>
+            <li>A mounted <code>PipAnchor</code> claims the id and the shuttle is moved into it.</li>
+            <li>With no anchor mounted, the shuttle parks in a hidden <strong>garage</strong> — still connected to the document, so media keeps playing and state survives.</li>
+            <li>Moves use the native <code>moveBefore()</code> API where available, which relocates a node <em>without</em> running disconnect/reconnect callbacks. It falls back to <code>appendChild</code> otherwise.</li>
+          </ul>
+
+          <h3>PipProvider props</h3>
+          <table>
+            <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>registry</code></td><td><code>Record&lt;string, ReactNode&gt;</code></td><td>Persistent subtrees keyed by id. Each is rendered exactly once.</td></tr>
+              <tr><td><code>options</code></td><td><code>Record&lt;string, PipOptions&gt;</code></td><td>Per-id core options. <code>mode</code> and <code>id</code> are forced.</td></tr>
+              <tr><td><code>gcGraceMs</code></td><td><code>number</code></td><td>Eviction lease for an orphaned id. Default <code>30000</code>.</td></tr>
+              <tr><td><code>dormantMedia</code></td><td><code>'pause' | 'keep'</code></td><td><code>'pause'</code> (default) pauses garage-parked media.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>PipAnchor props</h3>
+          <table>
+            <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>id</code></td><td><code>string</code></td><td>Must be a key of the provider's <code>registry</code>.</td></tr>
+              <tr><td><code>reserve</code></td><td><code>'size' | 'ratio' | 'none'</code></td><td><code>'size'</code> (default) freezes the measured box while the content is away. <code>'ratio'</code> freezes <code>aspect-ratio</code>.</td></tr>
+              <tr><td><code>axis</code></td><td><code>'block' | 'inline' | 'both'</code></td><td>Which axis to freeze. Default <code>'block'</code>.</td></tr>
+              <tr><td><code>handoffMs</code></td><td><code>number</code></td><td>Restore-animation duration. Default <code>200</code>.</td></tr>
+              <tr><td><code>placeholder</code></td><td><code>ReactNode</code></td><td>Rendered while the content is elsewhere, positioned <code>absolute; inset: 0</code>.</td></tr>
+              <tr><td><code>as</code></td><td><code>ElementType</code></td><td>Element type for the anchor box. Must generate a real box. Default <code>'div'</code>.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-info">
+            <strong>Zero layout shift.</strong> An anchor mounting for a popped-out or parked id carries its
+            size reservation in the <em>first painted frame</em>, not applied by a later effect — so nothing
+            jumps. The restore animation is skipped automatically under
+            <code>prefers-reduced-motion: reduce</code> and when the movement is under 1px.
+          </div>
+
+          <div class="alert alert-warning">
+            <strong>The garage is not a security boundary.</strong> Parked content is marked
+            <code>inert</code> and <code>aria-hidden</code>, and skipped for layout and paint via
+            <code>content-visibility: hidden</code>. But parked scripts keep running and parked DOM stays
+            queryable by any same-page script. Never host untrusted content in a registry subtree.
+          </div>
+        `
+      },
+      {
+        id: 'dormancy-hooks',
+        title: 'Dormancy Hooks',
+        keywords: ['usedormancy', 'useactiveeffect', 'userevealeffect', 'useadaptiveinterval', 'throttle', 'background', 'frozen', 'activity level'],
+        summary: 'Throttle work in hosted subtrees when they are backgrounded, parked or frozen.',
+        content: `
+          <p>
+            Content hosted by a <code>PipProvider</code> never unmounts, so a naive
+            <code>setInterval</code> keeps polling forever — even while parked in the garage. The dormancy
+            hooks let a subtree scale its own work to how visible it actually is.
+          </p>
+
+          <h3>Activity levels</h3>
+          <p>Derived from placement, host visibility and the global freeze flag:</p>
+          <table>
+            <thead><tr><th>Level</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>active</code></td><td>Docked in a visible anchor, or in an open, visible PiP window.</td></tr>
+              <tr><td><code>background</code></td><td>Rendered, but its host document is hidden.</td></tr>
+              <tr><td><code>dormant</code></td><td>Parked in the garage.</td></tr>
+              <tr><td><code>frozen</code></td><td>Explicitly frozen. <code>useAdaptiveInterval</code> registers <strong>zero</strong> timers here.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>useDormancy()</h3>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>const { level, placement, isOpen, visible, revealCount } = useDormancy();</code></pre>
+          <p>The snapshot is referentially stable and frozen — safe to read every render.</p>
+
+          <h3>useActiveEffect(effect, deps)</h3>
+          <p>Runs the effect only while the level is <code>active</code>, and tears it down otherwise.</p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>useActiveEffect(() =&gt; {
+  const socket = connect();
+  return () =&gt; socket.close();
+}, [url]);</code></pre>
+
+          <h3>useRevealEffect(effect)</h3>
+          <p>Runs each time the subtree transitions <em>into</em> a rendered placement — the moment to refetch anything that went stale while parked.</p>
+
+          <h3>useAdaptiveInterval(callback, periods?)</h3>
+          <p>An interval whose period follows the activity level. Pass <code>null</code> for a level to disable it entirely.</p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>useAdaptiveInterval(refresh, {
+  active: 1000,
+  background: 15000,
+  dormant: 60000,
+  frozen: null,
+});</code></pre>
+        `
+      },
     ]
   },
   {

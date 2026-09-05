@@ -235,15 +235,15 @@ export default function CodeTabs() {
               onClick={() => { if (fw.active) { setActiveTab(i); setCopied(false); } }}
               className={`relative px-4 py-2 text-lg font-bold border-t-2 border-x-2 border-[var(--color-border)] rounded-t-md transition-all cursor-pointer ${
                 i === activeTab
-                  ? 'bg-white text-[var(--color-text)] translate-y-[2px] pb-3 shadow-none z-20'
+                  ? 'bg-[var(--paper-white)] text-[var(--color-text)] translate-y-[2px] pb-3 shadow-none z-20'
                   : fw.active
-                  ? 'bg-slate-200/80 hover:bg-slate-100/90 text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-                  : 'bg-slate-200/40 text-[var(--color-text-dim)] opacity-60 cursor-not-allowed'
+                  ? 'bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-card-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                  : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-dim)] opacity-60 cursor-not-allowed'
               }`}
             >
               {fw.name}
               {!fw.active && (
-                <span className="ml-1.5 text-[10px] px-1 py-0.5 rounded bg-slate-300 text-slate-600 font-bold font-sans">
+                <span className="ml-1.5 text-[10px] px-1 py-0.5 rounded bg-[var(--color-border-subtle)] text-[var(--color-text-muted)] font-bold font-sans">
                   soon
                 </span>
               )}
@@ -254,7 +254,7 @@ export default function CodeTabs() {
           <button
             type="button"
             onClick={handleCopy}
-            className="ml-auto mr-1 mb-2 p-1.5 rounded border border-[var(--color-border)] hover:bg-white text-[var(--color-text)] shadow-sm bg-slate-100 transition-colors cursor-pointer"
+            className="ml-auto mr-1 mb-2 p-1.5 rounded border border-[var(--color-border)] hover:bg-[var(--paper-white)] text-[var(--color-text)] shadow-sm bg-[var(--color-bg-elevated)] transition-colors cursor-pointer"
             title="Copy code"
           >
             {copied ? <Check size={14} className="text-[var(--color-emerald)]" /> : <Copy size={14} />}

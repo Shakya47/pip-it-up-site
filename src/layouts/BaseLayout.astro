@@ -24,6 +24,22 @@ const ogImage = new URL('/og-image.png', Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Applies the stored theme before first paint. Must stay inline and stay
+         first: a deferred or bundled script runs after the browser has already
+         painted the default palette, which is the white flash. -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('pip-it-up-theme');
+          if (stored === 'dark' || stored === 'light') {
+            document.documentElement.classList.add(stored);
+          }
+          // No stored choice: leave both classes off and let the
+          // prefers-color-scheme block in global.css follow the OS.
+        } catch (e) { /* private mode - fall through to the OS preference */ }
+      })();
+    </script>
+
     <!-- SEO -->
     <title>{title}</title>
     <meta name="description" content={description} />

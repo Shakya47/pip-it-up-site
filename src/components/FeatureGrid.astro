@@ -1,67 +1,118 @@
 ---
 // Feature Grid - Styled as a loose collage of pastel sticky notes/post-its
-const features = [
+interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+  /** Tailwind classes selecting one of the --note-* token sets. */
+  colorClasses: string;
+  rotation: string;
+  /** Stamps a "new" badge on the note. Only the 0.2.0 additions set it. */
+  isNew?: boolean;
+}
+
+const features: Feature[] = [
+  {
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/></svg>`,
+    title: 'Route-Persistent PiP',
+    description: 'Wrap the app in `PipProvider`, drop a `PipAnchor` per route. The PiP window survives navigation — no unmount, no reload.',
+    colorClasses: 'bg-[var(--note-green-bg)] border-[var(--note-green-line)] text-[var(--note-green-ink)] hover:bg-[var(--note-green-hover)]',
+    rotation: 'rotate-[-2deg]',
+    isNew: true,
+  },
+  {
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>`,
+    title: 'Zero Remounts',
+    description: 'Video playheads, canvas bitmaps, WebGL contexts and WebRTC streams keep running. The DOM node is moved, never recreated.',
+    colorClasses: 'bg-[var(--note-pink-bg)] border-[var(--note-pink-line)] text-[var(--note-pink-ink)] hover:bg-[var(--note-pink-hover)]',
+    rotation: 'rotate-[1.5deg]',
+    isNew: true,
+  },
+  {
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>`,
+    title: 'Automatic PiP',
+    description: '`useAutoPip` pops out the moment the tab is hidden, and reports whether a gesture or the browser paid for it.',
+    colorClasses: 'bg-[var(--note-yellow-bg)] border-[var(--note-yellow-line)] text-[var(--note-yellow-ink)] hover:bg-[var(--note-yellow-hover)]',
+    rotation: 'rotate-[2deg]',
+    isNew: true,
+  },
+  {
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    title: 'Dormancy Hooks',
+    description: '`useDormancy` and `useAdaptiveInterval` throttle work when content is parked or backgrounded. Zero timers when frozen.',
+    colorClasses: 'bg-[var(--note-purple-bg)] border-[var(--note-purple-line)] text-[var(--note-purple-ink)] hover:bg-[var(--note-purple-hover)]',
+    rotation: 'rotate-[-1deg]',
+    isNew: true,
+  },
+  {
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>`,
+    title: 'Zero Layout Shift',
+    description: 'Anchors reserve the exact box the content left behind, in the first painted frame. Nothing jumps when it pops out or returns.',
+    colorClasses: 'bg-[var(--note-cyan-bg)] border-[var(--note-cyan-line)] text-[var(--note-cyan-ink)] hover:bg-[var(--note-cyan-hover)]',
+    rotation: 'rotate-[-1.5deg]',
+    isNew: true,
+  },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`,
     title: 'Live Style Sync',
     description: 'MutationObserver keeps styles, themes, and CSS-in-JS changes synced in real time.',
-    colorClasses: 'bg-[#fef9c3] border-[#facc15]/30 text-[#713f12] hover:bg-[#fef08a]',
+    colorClasses: 'bg-[var(--note-yellow-bg)] border-[var(--note-yellow-line)] text-[var(--note-yellow-ink)] hover:bg-[var(--note-yellow-hover)]',
     rotation: 'rotate-[-1.5deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5A3.375 3.375 0 006.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0015 2.25h-1.5a2.251 2.251 0 00-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 00-9-9z"/></svg>`,
     title: 'Controlled & Uncontrolled',
     description: 'Works both ways — industry-standard API with `open` prop for full state control.',
-    colorClasses: 'bg-[#fce7f3] border-[#f472b6]/30 text-[#831843] hover:bg-[#fbcfe8]',
+    colorClasses: 'bg-[var(--note-pink-bg)] border-[var(--note-pink-line)] text-[var(--note-pink-ink)] hover:bg-[var(--note-pink-hover)]',
     rotation: 'rotate-[1deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>`,
     title: 'Move / Clone / Portal',
     description: 'Three DOM strategies. Move preserves state, portal keeps component tree intact.',
-    colorClasses: 'bg-[#dbeafe] border-[#60a5fa]/30 text-[#1e3a8a] hover:bg-[#bfdbfe]',
+    colorClasses: 'bg-[var(--note-blue-bg)] border-[var(--note-blue-line)] text-[var(--note-blue-ink)] hover:bg-[var(--note-blue-hover)]',
     rotation: 'rotate-[-2deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>`,
     title: 'Auto-sizing & Responsive',
     description: 'Windows adapt to content size automatically. Use `isInsidePip` for responsive PiP layouts.',
-    colorClasses: 'bg-[#d1fae5] border-[#34d399]/30 text-[#065f46] hover:bg-[#a7f3d0]',
+    colorClasses: 'bg-[var(--note-green-bg)] border-[var(--note-green-line)] text-[var(--note-green-ink)] hover:bg-[var(--note-green-hover)]',
     rotation: 'rotate-[2.5deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg>`,
     title: 'Keyboard Forwarding',
     description: 'Cmd+S, Cmd+K, and all shortcuts keep working inside the PiP window.',
-    colorClasses: 'bg-[#f3e8ff] border-[#c084fc]/30 text-[#581c87] hover:bg-[#e9d5ff]',
+    colorClasses: 'bg-[var(--note-purple-bg)] border-[var(--note-purple-line)] text-[var(--note-purple-ink)] hover:bg-[var(--note-purple-hover)]',
     rotation: 'rotate-[-1deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>`,
     title: 'Graceful Fallbacks',
     description: 'Firefox & Safari fallback to new tab, or your custom handler (e.g. a modal).',
-    colorClasses: 'bg-[#ecfeff] border-[#22d3ee]/30 text-[#083344] hover:bg-[#cffafe]',
+    colorClasses: 'bg-[var(--note-cyan-bg)] border-[var(--note-cyan-line)] text-[var(--note-cyan-ink)] hover:bg-[var(--note-cyan-hover)]',
     rotation: 'rotate-[1.5deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/></svg>`,
     title: 'SSR-Safe',
     description: 'Works in Next.js, Remix, and Vite out of the box. No hydration mismatches.',
-    colorClasses: 'bg-[#fef9c3] border-[#facc15]/30 text-[#713f12] hover:bg-[#fef08a]',
+    colorClasses: 'bg-[var(--note-yellow-bg)] border-[var(--note-yellow-line)] text-[var(--note-yellow-ink)] hover:bg-[var(--note-yellow-hover)]',
     rotation: 'rotate-[-2.5deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.54a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.34 8.586" transform="translate(2, 2) scale(0.83)"/></svg>`,
     title: 'Decoupled Triggers',
     description: 'Named registry lets any trigger connect to any wrapper — no shared context needed.',
-    colorClasses: 'bg-[#fce7f3] border-[#f472b6]/30 text-[#831843] hover:bg-[#fbcfe8]',
+    colorClasses: 'bg-[var(--note-pink-bg)] border-[var(--note-pink-line)] text-[var(--note-pink-ink)] hover:bg-[var(--note-pink-hover)]',
     rotation: 'rotate-[1.5deg]',
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>`,
     title: 'TypeScript-First',
     description: 'Generic-typed hooks, full IntelliSense, zero type casting needed.',
-    colorClasses: 'bg-[#dbeafe] border-[#60a5fa]/30 text-[#1e3a8a] hover:bg-[#bfdbfe]',
+    colorClasses: 'bg-[var(--note-blue-bg)] border-[var(--note-blue-line)] text-[var(--note-blue-ink)] hover:bg-[var(--note-blue-hover)]',
     rotation: 'rotate-[-1.5deg]',
   },
 ];
@@ -75,14 +126,19 @@ const features = [
         Everything you need for PiP
       </h2>
       <p class="text-base sm:text-lg font-typewriter text-[var(--color-text-muted)] max-w-2xl mx-auto">
-        A comprehensive API designed for real-world use cases — from simple pop-outs to complex editor workflows.
+        A comprehensive API designed for real-world use cases — from simple pop-outs to route-persistent editor workflows.
       </p>
     </div>
 
     <!-- Feature grid (loose sticky notes) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-reveal-stagger>
       {features.map((feature) => (
-        <div class:list={['sticky-note p-6 border-2 border-dashed shadow-md transition-all duration-300 flex flex-col items-start', feature.rotation, feature.colorClasses]}>
+        <div class:list={['sticky-note relative p-6 border-2 border-dashed shadow-md transition-all duration-300 flex flex-col items-start', feature.rotation, feature.colorClasses]}>
+          {feature.isNew && (
+            <span class="absolute -top-2 -right-2 rotate-[8deg] px-1.5 py-0.5 text-[10px] font-bold font-handwritten tracking-wider uppercase border-2 border-[var(--color-border)] bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[1px_1px_0px_var(--color-border)]">
+              new
+            </span>
+          )}
           <!-- Ink Icon -->
           <div class="mb-4 opacity-80">
             <Fragment set:html={feature.icon} />
