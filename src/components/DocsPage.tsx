@@ -135,11 +135,15 @@ export default function DocsPage() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-24 flex flex-col md:flex-row gap-8 relative z-10">
       
       {/* ─── Left Sidebar Navigation (Notepad card) ─── */}
-      <aside className="w-full md:w-64 shrink-0 bg-white border-2 border-[var(--color-border)] p-6 shadow-md relative md:sticky md:top-24 md:h-[calc(100vh-120px)] md:overflow-y-auto rotate-[-0.5deg] z-10 font-handwritten">
+      <aside className="w-full md:w-64 shrink-0 bg-[var(--paper-white)] border-2 border-[var(--color-border)] shadow-md relative md:sticky md:top-24 md:h-[calc(100vh-120px)] rotate-[-0.5deg] z-10 font-handwritten">
         {/* Red Thumbtack pin */}
         <div className="thumbtack !-top-3.5 !left-1/2 !-translate-x-1/2"></div>
         {/* Washi tape label */}
-        <div className="absolute -bottom-3 -right-2 washi-tape washi-tape-orange text-xs rotate-[-5deg]">INDEX</div>
+        <div className="absolute -bottom-3 -right-2 washi-tape washi-tape-orange text-xs rotate-[-5deg] z-20 pointer-events-none">INDEX</div>
+
+        {/* Scroll lives here, not on <aside>, so the pinned tape and thumbtack
+            stay on the card edge instead of riding down the nav list. */}
+        <div className="p-6 md:h-full md:overflow-y-auto">
 
         {/* Search Box */}
         <div className="relative mb-6">
@@ -151,7 +155,7 @@ export default function DocsPage() {
             placeholder="Search docs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[#fbfbf9] border-2 border-[var(--color-border)] rounded-md font-sans text-sm text-[var(--color-text)] placeholder-[var(--color-text-dim)] focus:outline-none focus:border-[var(--color-accent-light)] shadow-sm"
+            className="w-full pl-9 pr-4 py-2 bg-[var(--color-bg-code)] border-2 border-[var(--color-border)] rounded-md font-sans text-sm text-[var(--color-text)] placeholder-[var(--color-text-dim)] focus:outline-none focus:border-[var(--color-accent-light)] shadow-sm"
           />
         </div>
 
@@ -172,8 +176,8 @@ export default function DocsPage() {
                           onClick={() => selectSection(sec.id)}
                           className={`w-full text-left py-1 px-2.5 rounded text-base transition-all cursor-pointer font-bold ${
                             isActive
-                              ? 'text-[var(--color-text)] bg-amber-100/70 border border-[var(--color-border)] rotate-[1deg]'
-                              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-slate-50 border border-transparent'
+                              ? 'text-[var(--note-yellow-ink)] bg-[var(--note-yellow-bg)] border border-[var(--color-border)] rotate-[1deg]'
+                              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-elevated)] border border-transparent'
                           }`}
                         >
                           {sec.title}
@@ -249,10 +253,11 @@ export default function DocsPage() {
             )}
           </div>
         )}
+        </div>
       </aside>
 
       {/* ─── Main Content Pane (Typewriter sheet) ─── */}
-      <main className="flex-1 min-w-0 bg-white border-2 border-[var(--color-border)] p-6 sm:p-10 shadow-md relative rotate-[0.5deg]">
+      <main className="flex-1 min-w-0 bg-[var(--paper-white)] border-2 border-[var(--color-border)] p-6 sm:p-10 shadow-md relative rotate-[0.5deg]">
         {/* Pink Washi tape on top-right */}
         <div className="absolute -top-4 -right-4 washi-tape washi-tape-pink text-xs rotate-[4deg] z-10">DOCS</div>
         {/* Blue Washi tape on bottom-left */}

@@ -16,7 +16,7 @@ export default function HeroDemo() {
   if (!mounted) {
     return (
       <div className="w-full max-w-xl mx-auto mt-10 mb-8 px-4 animate-pulse">
-        <div className="polaroid-frame bg-white text-[var(--color-text)] border border-[#e5e5df] p-4 pb-10 shadow-xl">
+        <div className="polaroid-frame bg-[var(--paper-white)] text-[var(--color-text)] border border-[var(--paper-edge)] p-4 pb-10 shadow-xl">
           <div className="relative rounded border-2 border-[var(--color-border)] bg-[#1e2024] h-[240px] flex flex-col justify-center items-center">
             <span className="text-sm font-mono text-gray-500">Loading editor...</span>
           </div>
@@ -28,16 +28,16 @@ export default function HeroDemo() {
   return (
     <div className="w-full max-w-xl mx-auto mt-10 mb-8 px-4">
       {/* Polaroid border wrapper (stays on page, doesn't go to PiP) */}
-      <div className="polaroid-frame bg-white text-[var(--color-text)] border border-[#e5e5df] p-4 pb-10 shadow-xl rotate-[-1deg]">
+      <div className="polaroid-frame bg-[var(--paper-white)] text-[var(--color-text)] border border-[var(--paper-edge)] p-4 pb-10 shadow-xl rotate-[-1deg]">
         <PipWrapper
           id="hero-demo"
           copyStyles="sync"
           mode="move"
           fallback="none"
           placeholder={
-            <div className="flex flex-col items-center justify-center h-[240px] bg-slate-100 border border-dashed border-slate-300 text-slate-500 rounded">
-              <p className="text-sm font-medium font-handwritten text-lg text-slate-500">Popped into PiP window! 🚀</p>
-              <PipTrigger className="mt-4 px-4 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-[var(--color-text)] font-handwritten font-bold border border-[var(--color-border)] text-sm shadow-sm transition-all rotate-[2deg] cursor-pointer">
+            <div className="flex flex-col items-center justify-center h-[240px] bg-[var(--color-bg-elevated)] border border-dashed border-[var(--color-border)] text-[var(--color-text-dim)] rounded">
+              <p className="text-sm font-medium font-handwritten text-lg text-[var(--color-text-dim)]">Popped into PiP window! 🚀</p>
+              <PipTrigger className="mt-4 px-4 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-[var(--color-on-accent)] font-handwritten font-bold border border-[var(--color-border)] text-sm shadow-sm transition-all rotate-[2deg] cursor-pointer">
                 Restore to page
               </PipTrigger>
             </div>
@@ -56,7 +56,7 @@ export default function HeroDemo() {
                 <span className="ml-1 text-[10px] text-gray-400 font-mono">live-editor.tsx</span>
               </div>
               <PipTrigger
-                className="inline-flex items-center gap-1.5 px-3 py-1 font-handwritten text-sm font-bold bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border border-[var(--color-border)] text-[var(--color-text)] shadow-sm hover:scale-105 active:scale-95 transition-all rotate-[1deg] cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1 font-handwritten text-sm font-bold bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] border border-[var(--color-border)] text-[var(--color-on-accent)] shadow-sm hover:scale-105 active:scale-95 transition-all rotate-[1deg] cursor-pointer"
                 openLabel=""
                 closeLabel=""
                 renderOpen={
@@ -111,7 +111,7 @@ export default function HeroDemo() {
           </div>
         </PipWrapper>
         {/* Polaroid handwritten caption */}
-        <div className="text-center mt-3 font-handwritten text-lg text-gray-700 tracking-wide rotate-[0.5deg]">
+        <div className="text-center mt-3 font-handwritten text-lg text-[var(--color-text-muted)] tracking-wide rotate-[0.5deg]">
           live demo — try editing! ✏️
         </div>
       </div>
