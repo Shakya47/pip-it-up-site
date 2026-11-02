@@ -27,3 +27,5 @@ specs_tickets/
 
 # IDE files
 .vscode/
+test-results/
+playwright-report/
