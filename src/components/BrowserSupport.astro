@@ -1,14 +1,14 @@
 ---
 // Browser Support - Styled as a typewriter sheet taped down with blue Washi tape
 const browsers = [
-  { name: 'Chrome', version: '116+', supported: true, icon: 'chrome' },
-  { name: 'Edge', version: '116+', supported: true, icon: 'edge' },
-  { name: 'Firefox', version: 'N/A', supported: false, note: 'Fallback', icon: 'firefox' },
-  { name: 'Safari', version: 'N/A', supported: false, note: 'Fallback', icon: 'safari' },
+  { name: 'Chrome / Edge', version: '116+', supported: true },
+  { name: 'Firefox', version: '151+', supported: true },
+  { name: 'Safari (macOS, iOS)', version: 'Video PiP only', supported: false, note: 'Video PiP fallback' },
+  { name: 'Mobile Chrome / Firefox', version: 'Varies', supported: false, note: 'Video PiP fallback' },
 ];
 ---
 
-<section id="browser-support" class="relative py-24 px-4 sm:px-6">
+<section id="browser-support" class="relative py-14 md:py-24 px-4 sm:px-6">
   <div class="max-w-3xl mx-auto">
     <div class="text-center mb-16" data-reveal>
       <h2 class="text-4xl sm:text-5xl font-handwritten font-extrabold mb-4 text-[var(--color-text)]">
@@ -43,7 +43,7 @@ const browsers = [
               <td class="py-4">
                 {browser.supported ? (
                   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded border border-emerald-600 bg-[var(--note-green-bg)] text-[var(--note-green-ink)] text-xs font-bold font-sans">
-                    ✓ Full Support
+                    ✓ Document PiP
                   </span>
                 ) : (
                   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded border border-[var(--note-yellow-line)] bg-[var(--note-yellow-bg)] text-[var(--note-yellow-ink)] text-xs font-bold font-sans">
@@ -59,7 +59,7 @@ const browsers = [
       <!-- Note inside typewriter sheet -->
       <div class="mt-6 pt-4 border-t border-[var(--color-border)]">
         <p class="text-xs text-[var(--color-text-muted)] leading-relaxed">
-          * Requires HTTPS and a user gesture (click/keypress) to open. Firefox & Safari fall back or trigger your custom layout handler gracefully.
+          * Requires HTTPS and a user gesture (click/keypress) to open. Where Document PiP is missing, content holding a single &lt;video&gt; uses native Video PiP; otherwise pip-it-up opens a popup tab or runs your own fallback. Tested end to end in Chrome, Firefox, WebKit and Safari.
         </p>
       </div>
     </div>
