@@ -4,16 +4,24 @@ The ultimate toolkit for the **Document Picture-in-Picture API**.
 
 Pop any UI component — editors, dashboards, video players, chat widgets — into a floating **Picture-in-Picture** window with zero config. Auto-sizing. Full style sync. Framework-agnostic core with official React bindings.
 
-## 🆕 New in 0.2.0
+## 🆕 New in 0.3.0
 
-- **Route-Persistent PiP** — `<PipProvider>` hosts content above your router and `<PipAnchor>` docks it into whichever route is on screen. The floating window survives navigation.
-- **Zero Remounts** — `<PipWrapper>` no longer rebuilds its subtree when the window opens or closes. Video playheads, canvas bitmaps, WebGL contexts, WebRTC streams and component state all keep running. The node is *moved*, not recreated.
-- **Automatic PiP** — `useAutoPip` / `createAutoPip` pop out the moment the tab is hidden, and report whether a user gesture or the browser authorised the attempt.
-- **Dormancy Hooks** — `useDormancy`, `useActiveEffect`, `useRevealEffect` and `useAdaptiveInterval` throttle work in hosted subtrees while they are backgrounded or parked. Zero timers when frozen.
-- **Zero Layout Shift** — Anchors reserve the exact box the content left behind in the first painted frame, so nothing jumps on the way out or back.
-- **Synchronous Teardown** — `registerTeardown` runs before the PiP document dies, for DOM repatriation that cannot wait for an async callback.
+- **Tested in Real Browsers** — A Playwright end-to-end suite runs against Chrome, Firefox, WebKit, real Safari and Next.js SSR. 0.3.0 is the fixes it found.
+- **`open()` Rejects on Failure** — Blocked, refused or aborted opens now reject instead of resolving, so `useAutoPip` and `createAutoPip` report the real outcome. Add a `.catch()` to un-awaited `open()` / `toggle()` calls.
+- **Typed Error Codes** — `ERR_OPEN_ABORTED`, `ERR_WINDOW_CLOSED`, `ERR_INVALID_FALLBACK`, exported as `PipOpenErrorCode`. `close()` or `destroy()` mid-open cancels cleanly.
+- **Better `isSupported`** — `<PipTrigger>` now shows `renderUnsupported` in video-PiP-only browsers like Safari instead of a button that does nothing.
+- **React Events Inside PiP** — `usePip()` bridges `onClick`, `onChange` and friends in moved content, and survives Strict Mode.
+- **Safer Route Changes** — `<PipProvider>` parks hosted content before its anchor goes away (iframes don't reload), supports the `frozen` level, and docks correctly after Next.js hydration.
 
-> Upgrading from 0.1.x? Two behaviour changes are worth reading first — see [Upgrading to 0.2.0](https://pip-it-up.vercel.app/docs#upgrading).
+> Upgrading from 0.2.x? `open()` now rejects — see [Upgrading to 0.3.0](https://pip-it-up.vercel.app/docs#upgrading-0-3-0).
+
+### Also in 0.2.0
+
+- **Route-Persistent PiP** — `<PipProvider>` + `<PipAnchor>` keep the floating window alive across navigation.
+- **Zero Remounts** — `<PipWrapper>` moves its subtree instead of recreating it.
+- **Automatic PiP** — `useAutoPip` / `createAutoPip` pop out when the tab is hidden.
+- **Dormancy Hooks** — `useDormancy`, `useActiveEffect`, `useRevealEffect`, `useAdaptiveInterval`.
+- **Synchronous Teardown** — `registerTeardown` runs before the PiP document dies.
 
 ## ✨ Features
 
@@ -90,12 +98,23 @@ useAutoPip(enter, { when: () => !videoRef.current?.paused });
 
 ## 🌐 Browser Support
 
-| Browser | Document PiP Support |
-| :------ | :------------------- |
-| Chrome  | ≥ 116 ✅             |
-| Edge    | ≥ 116 ✅             |
-| Safari  | Fallback mode        |
-| Firefox | Fallback mode        |
+| Browser | Document PiP (any content) | Native Video PiP (single `<video>`) |
+| :------ | :------------------------- | :---------------------------------- |
+| Chrome / Edge (desktop) | ≥ 116 ✅ | ✅ |
+| Firefox (desktop) | ≥ 151 ✅ | ✅ |
+| Safari (macOS, iOS) | ❌ | ✅ |
+| Mobile Chrome / Firefox | ❌ | Varies |
+
+Where Document PiP is missing, content holding exactly one `<video>` falls back to native Video PiP, then to your `fallback` option. Tested end to end in Chrome, Firefox, WebKit and Safari.
+
+## 🗺 Roadmap
+
+- [x] Seamless video / canvas / WebRTC PiP (the DOM node moves, never remounts)
+- [x] Route-persistent and automatic PiP
+- [x] Real-browser end-to-end testing
+- [ ] Vue and Svelte bindings
+- [ ] Angular bindings
+- [ ] v1.0 stable release
 
 ## 🔗 Links
 

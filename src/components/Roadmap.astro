@@ -1,0 +1,106 @@
+---
+// Roadmap - Styled as a hand-drawn treasure map on aged parchment paper
+const items = [
+  {
+    title: 'Seamless video, canvas & WebRTC PiP',
+    description: 'The same DOM node moves into the window and back, so video keeps playing. With PipProvider, content parked between routes uses moveBefore() where the browser has it, so iframes do not reload.',
+    status: 'Done',
+  },
+  {
+    title: 'Route-persistent PiP & automatic PiP',
+    description: 'PipProvider / PipAnchor keep the window alive across navigation, and useAutoPip pops out when the tab is hidden.',
+    status: 'Done',
+  },
+  {
+    title: 'Real-browser end-to-end testing',
+    description: 'Chrome, Firefox, WebKit, real Safari and Next.js SSR. 0.3.0 ships the fixes it found.',
+    status: 'Done',
+  },
+  {
+    title: 'Vue and Svelte bindings',
+    description: '@pip-it-up/vue and @pip-it-up/svelte.',
+    status: 'Planned',
+  },
+  {
+    title: 'Angular bindings',
+    description: '@pip-it-up/angular.',
+    status: 'Planned',
+  },
+  {
+    title: 'v1.0 stable release',
+    description: 'Locked API and full browser matrix testing. The API can still change before v1.0.',
+    status: 'Planned',
+  },
+];
+---
+
+<section id="roadmap" class="relative py-14 md:py-24 px-4 sm:px-6 overflow-hidden">
+  <div class="max-w-3xl mx-auto">
+    <!-- Section Header -->
+    <div class="text-center mb-16" data-reveal>
+      <h2 class="text-4xl sm:text-5xl font-handwritten font-extrabold mb-4 text-[var(--color-text)]">
+        Roadmap
+      </h2>
+      <p class="text-base sm:text-lg font-typewriter text-[var(--color-text-muted)] max-w-xl mx-auto">
+        Follow our dotted trail to the future of Picture-in-Picture.
+      </p>
+    </div>
+
+    <!-- Parchment Treasure Map Card -->
+    <div class="bg-[var(--note-yellow-bg)] border-2 border-[var(--color-border)] p-8 sm:p-12 shadow-lg relative rounded-sm rotate-[0.5deg]" data-reveal>
+      <!-- Washi tape at the top-middle -->
+      <div class="absolute -top-4 left-1/2 -translate-x-1/2 washi-tape washi-tape-orange rotate-[-2deg] z-10">TREASURE MAP</div>
+      
+      <!-- Winding Wavy Trail (SVG) -->
+      <div class="absolute inset-0 pointer-events-none opacity-20">
+        <svg class="w-full h-full text-[var(--color-text-dim)]" viewBox="0 0 600 600" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="10 10">
+          <path d="M 300 40 Q 150 150 300 250 T 300 450 Q 450 550 300 580" />
+        </svg>
+      </div>
+
+      <!-- Roadmap Items Stack inside a wobbly collage -->
+      <div class="relative flex flex-col gap-8 font-handwritten max-w-xl mx-auto">
+        {items.map((item, idx) => {
+          const isEven = idx % 2 === 0;
+          
+          const isDone = item.status === 'Done';
+          const badgeClass = isDone 
+            ? 'border-[var(--note-green-line)] bg-[var(--note-green-bg)] text-[var(--note-green-ink)]'
+            : 'border-[var(--note-yellow-line)] bg-[var(--paper-white)] text-[var(--note-yellow-ink)]';
+
+          return (
+            <div class:list={[
+              'bg-[var(--paper-white)] border border-[var(--color-border-subtle)] p-6 shadow-sm relative z-10',
+              isEven ? 'rotate-[-1deg] translate-x-[-4px]' : 'rotate-[1deg] translate-x-[4px]'
+            ]}>
+              <div class="flex items-center justify-between gap-4 mb-2">
+                <h3 class="text-2xl font-bold text-[var(--color-text)]">{item.title}</h3>
+                <span class={`text-sm font-bold px-2.5 py-0.5 border-2 rounded ${badgeClass}`}>
+                  {item.status}
+                </span>
+              </div>
+              <p class="text-sm font-sans text-[var(--color-text-muted)] leading-relaxed">
+                {item.description}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+    <!-- Issue Callout -->
+    <div class="mt-16 text-center" data-reveal>
+      <p class="text-base font-handwritten text-[var(--color-text-muted)]">
+        Have a feature request or want to contribute? 
+        <a 
+          href="https://github.com/Shakya47/pip-it-up/issues" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-[var(--color-text)] underline decoration-wavy hover:text-[var(--color-accent-dark)] font-bold ml-1"
+        >
+          Open an issue on GitHub &rarr;
+        </a>
+      </p>
+    </div>
+  </div>
+</section>

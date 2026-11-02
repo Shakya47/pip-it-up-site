@@ -298,7 +298,7 @@ export default function EditorDemos() {
   }, []);
 
   return (
-    <section id="editor-demos" className="relative py-24 px-4 sm:px-6">
+    <section id="editor-demos" className="relative py-14 md:py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-14">

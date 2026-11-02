@@ -7,18 +7,33 @@ interface Feature {
   /** Tailwind classes selecting one of the --note-* token sets. */
   colorClasses: string;
   rotation: string;
-  /** Stamps a "new" badge on the note. Only the 0.2.0 additions set it. */
+  /** Stamps a "new" badge on the note. Only the latest release additions set it. */
   isNew?: boolean;
 }
 
 const features: Feature[] = [
+  {
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    title: 'Tested in Real Browsers',
+    description: 'An end-to-end suite runs on Chrome, Firefox, WebKit, real Safari and Next.js SSR. Bugs it found are fixed in 0.3.0.',
+    colorClasses: 'bg-[var(--note-green-bg)] border-[var(--note-green-line)] text-[var(--note-green-ink)] hover:bg-[var(--note-green-hover)]',
+    rotation: 'rotate-[1.5deg]',
+    isNew: true,
+  },
+  {
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>`,
+    title: 'Honest Errors',
+    description: '`open()` rejects when a browser refuses, with typed `ERR_*` codes. Cancel a pending open and it aborts cleanly.',
+    colorClasses: 'bg-[var(--note-pink-bg)] border-[var(--note-pink-line)] text-[var(--note-pink-ink)] hover:bg-[var(--note-pink-hover)]',
+    rotation: 'rotate-[-1.5deg]',
+    isNew: true,
+  },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/></svg>`,
     title: 'Route-Persistent PiP',
     description: 'Wrap the app in `PipProvider`, drop a `PipAnchor` per route. The PiP window survives navigation — no unmount, no reload.',
     colorClasses: 'bg-[var(--note-green-bg)] border-[var(--note-green-line)] text-[var(--note-green-ink)] hover:bg-[var(--note-green-hover)]',
     rotation: 'rotate-[-2deg]',
-    isNew: true,
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>`,
@@ -26,7 +41,6 @@ const features: Feature[] = [
     description: 'Video playheads, canvas bitmaps, WebGL contexts and WebRTC streams keep running. The DOM node is moved, never recreated.',
     colorClasses: 'bg-[var(--note-pink-bg)] border-[var(--note-pink-line)] text-[var(--note-pink-ink)] hover:bg-[var(--note-pink-hover)]',
     rotation: 'rotate-[1.5deg]',
-    isNew: true,
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>`,
@@ -34,7 +48,6 @@ const features: Feature[] = [
     description: '`useAutoPip` pops out the moment the tab is hidden, and reports whether a gesture or the browser paid for it.',
     colorClasses: 'bg-[var(--note-yellow-bg)] border-[var(--note-yellow-line)] text-[var(--note-yellow-ink)] hover:bg-[var(--note-yellow-hover)]',
     rotation: 'rotate-[2deg]',
-    isNew: true,
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
@@ -42,7 +55,6 @@ const features: Feature[] = [
     description: '`useDormancy` and `useAdaptiveInterval` throttle work when content is parked or backgrounded. Zero timers when frozen.',
     colorClasses: 'bg-[var(--note-purple-bg)] border-[var(--note-purple-line)] text-[var(--note-purple-ink)] hover:bg-[var(--note-purple-hover)]',
     rotation: 'rotate-[-1deg]',
-    isNew: true,
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>`,
@@ -50,7 +62,6 @@ const features: Feature[] = [
     description: 'Anchors reserve the exact box the content left behind, in the first painted frame. Nothing jumps when it pops out or returns.',
     colorClasses: 'bg-[var(--note-cyan-bg)] border-[var(--note-cyan-line)] text-[var(--note-cyan-ink)] hover:bg-[var(--note-cyan-hover)]',
     rotation: 'rotate-[-1.5deg]',
-    isNew: true,
   },
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`,
@@ -90,7 +101,7 @@ const features: Feature[] = [
   {
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>`,
     title: 'Graceful Fallbacks',
-    description: 'Firefox & Safari fallback to new tab, or your custom handler (e.g. a modal).',
+    description: 'A single `<video>` uses native Video PiP on Safari and iOS. Otherwise a new tab, or your custom handler (e.g. a modal).',
     colorClasses: 'bg-[var(--note-cyan-bg)] border-[var(--note-cyan-line)] text-[var(--note-cyan-ink)] hover:bg-[var(--note-cyan-hover)]',
     rotation: 'rotate-[1.5deg]',
   },
@@ -118,7 +129,7 @@ const features: Feature[] = [
 ];
 ---
 
-<section id="features" class="relative py-24 px-4 sm:px-6">
+<section id="features" class="relative py-14 md:py-24 px-4 sm:px-6">
   <div class="max-w-5xl mx-auto">
     <!-- Section header -->
     <div class="text-center mb-16" data-reveal>
@@ -146,7 +157,7 @@ const features: Feature[] = [
           <!-- Title -->
           <h3 class="text-2xl font-bold font-handwritten mb-2 tracking-wide">{feature.title}</h3>
           <!-- Description -->
-          <p class="text-sm font-sans leading-relaxed opacity-95">{feature.description}</p>
+          <p class="text-sm font-sans leading-relaxed opacity-95" set:html={feature.description.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/`([^`]+)`/g, '<code class="font-mono text-[0.85em] px-1 rounded bg-black/10">$1</code>')} />
         </div>
       ))}
     </div>

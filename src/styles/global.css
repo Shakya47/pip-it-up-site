@@ -83,12 +83,18 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Rotated cards and washi tape poke a few px past the viewport on phones. */
+html {
+  overflow-x: hidden; /* fallback for browsers without `clip` */
+  overflow-x: clip;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
   line-height: 1.7;
-  overflow-x: hidden;
+  overflow-x: clip; /* not hidden: that would make body a scroll container and break position: sticky */
   position: relative;
   /* Paper grain/noise texture overlay */
   background-image: 
@@ -500,6 +506,23 @@ body {
   border: 2px solid var(--color-border);
   font-family: var(--font-typewriter);
   font-size: 0.85rem;
+}
+
+/* Wide tables scroll inside their own box instead of being cut off or widening the page. */
+.docs-content .table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 1.5rem 0;
+}
+
+.docs-content .table-scroll table {
+  margin: 0;
+  /* Below this the description column gets squeezed into a tall sliver; scroll instead. */
+  min-width: 40rem;
+}
+
+.docs-content .table-scroll td:last-child {
+  min-width: 15rem;
 }
 
 .docs-content th, .docs-content td {
