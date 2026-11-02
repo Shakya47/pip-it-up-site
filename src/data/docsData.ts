@@ -20,7 +20,7 @@ export const docsData: DocCategory[] = [
       {
         id: 'introduction',
         title: 'Introduction',
-        keywords: ['pip', 'document picture-in-picture', 'floating window', 'dom moving', 'features', 'browser support', 'route persistent', 'zero remount', 'auto pip'],
+        keywords: ['pip', 'document picture-in-picture', 'floating window', 'dom moving', 'features', 'browser support', 'route persistent', 'zero remount', 'auto pip', 'real browser tested', 'e2e'],
         summary: 'Learn about pip-it-up, the ultimate Document Picture-in-Picture toolkit for the web.',
         content: `
           <p>
@@ -36,6 +36,7 @@ export const docsData: DocCategory[] = [
             <li><strong>Graceful Fallbacks:</strong> Degrades smoothly to browser popups, modal views, or classic Video PiP on unsupported browsers (Safari, Firefox, and mobile devices).</li>
             <li><strong>Zero Remounts:</strong> Content is moved, never recreated. Playheads, canvas bitmaps, WebGL contexts and component state survive every transition.</li>
             <li><strong>Route Persistence:</strong> <code>PipProvider</code> and <code>PipAnchor</code> keep a floating window alive across navigation, docking it into whichever route is on screen.</li>
+            <li><strong>Real-Browser Tested:</strong> An end-to-end suite runs against Chrome, Firefox, WebKit, real Safari and Next.js SSR, and <code>open()</code> rejects honestly when a browser refuses.</li>
             <li><strong>Automatic PiP:</strong> <code>useAutoPip</code> pops out the moment the tab is hidden, reporting whether a user gesture or the browser authorised it.</li>
           </ul>
 
@@ -97,8 +98,80 @@ const pip = createPip({
 
 // Trigger open on click
 document.getElementById('btn-open').addEventListener('click', () => {
-  pip.open({ contentEl, originEl });
+  pip.open({ contentEl, originEl }).catch((err) => console.warn('PiP failed:', err));
 });</code></pre>
+        `
+      },
+      {
+        id: 'upgrading-0-3-0',
+        title: 'Upgrading to 0.3.0',
+        keywords: ['upgrade', 'migration', 'breaking changes', '0.3.0', 'changelog', 'behaviour change', 'open rejects', 'catch', 'errors', 'abort', 'isSupported', 'e2e'],
+        summary: 'What changed between 0.2.x and 0.3.0: open() now rejects on failure, and several quieter behaviour changes.',
+        content: `
+          <p>
+            0.3.0 comes out of a real-browser end-to-end suite (Chrome, Firefox, WebKit, real Safari and
+            Next.js SSR). It fixes a long list of bugs the suite found, and a few of those fixes change behaviour.
+            The biggest one: <strong><code>open()</code> now rejects when it fails.</strong>
+          </p>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>npm i @pip-it-up/core@^0.3.0 @pip-it-up/react@^0.3.0</code></pre>
+
+          <h3>Do this first</h3>
+          <div class="alert alert-warning">
+            <strong>Add a <code>.catch()</code> to any <code>open()</code> or <code>toggle()</code> you call without awaiting.</strong>
+            <code>onError</code> is still called first, but the promise used to resolve whenever <code>onError</code>
+            was set, so <code>createAutoPip</code> and <code>useAutoPip</code> reported blocked attempts as successes.
+            <code>&lt;PipTrigger&gt;</code> already handles this for you.
+          </div>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>button.addEventListener('click', () => {
+  pip.open().catch((err) => {
+    if (err.name === 'AbortError') return; // you cancelled it
+    console.error(err.code ?? err.name, err);
+  });
+});</code></pre>
+          <p>
+            <code>useVideoPip</code> follows the same rule: <code>enter()</code> and <code>leave()</code> reject when the
+            browser refuses (for example <code>NotAllowedError</code> without a recent gesture), and <code>enter()</code>
+            rejects when no <code>&lt;video&gt;</code> is attached. <code>toggle()</code> still never rejects.
+          </p>
+
+          <h3>More failures now reject</h3>
+          <ul>
+            <li>The automatic video fallback is refused by the browser (Safari <code>NotAllowedError</code>) and <code>fallback</code> is <code>'none'</code>.</li>
+            <li>A custom <code>fallback</code> function throws.</li>
+            <li><code>fallback: 'new-tab'</code> has no usable <code>fallbackUrl</code> (<code>ERR_INVALID_FALLBACK</code>).</li>
+            <li>The window is already closed when it arrives (<code>ERR_WINDOW_CLOSED</code>).</li>
+          </ul>
+
+          <h3>Cancelling an open</h3>
+          <p>
+            Calling <code>close()</code> or <code>destroy()</code> while <code>open()</code> is still pending now cancels it.
+            A late window is closed and <code>open()</code> rejects with an <code>AbortError</code>
+            (<code>ERR_OPEN_ABORTED</code>); <code>onError</code> is not called. Previously the window opened anyway.
+            A controlled <code>&lt;PipWrapper open={false}&gt;</code> set mid-open cancels it too.
+          </p>
+
+          <h3>Other behaviour changes</h3>
+          <ul>
+            <li><strong><code>state.isSupported</code></strong> now means "<code>open()</code> will do something for this instance": Document PiP, the automatic single-<code>&lt;video&gt;</code> fallback, or a usable <code>fallback</code>. <code>&lt;PipTrigger&gt;</code> uses it, so <code>renderUnsupported</code> finally shows in Safari-style browsers. <code>useIsPipSupported()</code> is unchanged.</li>
+            <li><strong><code>&lt;PipTrigger&gt;</code></strong> with no <code>&lt;PipWrapper&gt;</code> around it and no <code>pipId</code> renders nothing (or <code>renderUnsupported</code>) instead of a dead button.</li>
+            <li><strong><code>&lt;PipWrapper&gt;</code></strong> accepts no <code>mode</code> prop (it always portals). Without <code>width</code>/<code>height</code> it sizes the window to your content's own element instead of its full-width wrapper, and a custom <code>fallback</code> function receives that element as <code>contentEl</code>.</li>
+            <li><strong><code>fixedSize</code></strong> keeps the size lock on the PiP document but no longer tries to <code>resizeTo()</code> the window, which browsers only allow with a user gesture.</li>
+            <li>If something throws after the window opened (<code>onOpen</code>, style sync), the window is now closed and teardown hooks run. A throwing <code>onError</code> no longer replaces the original error.</li>
+            <li>In development builds, <code>ERR_UNKNOWN_ID</code> now throws and <code>ERR_DUPLICATE_ANCHOR</code> plus anchor style warnings appear. These diagnostics were silently off before.</li>
+          </ul>
+
+          <h3>Fixes you get for free</h3>
+          <ul>
+            <li>Move mode returns content to the <code>originEl</code> passed to <code>open()</code>, restores the inline width/height it overwrote, and restores focus, selection and scroll after the content is back.</li>
+            <li><code>usePip()</code> now bridges React event handlers (<code>onClick</code>, <code>onChange</code>…) inside moved content, and survives React Strict Mode.</li>
+            <li><code>useAutoPip</code> honours its <code>signal</code> option.</li>
+            <li><code>&lt;PipWrapper reserveSpace={false}&gt;</code> no longer reserves space.</li>
+            <li><code>&lt;PipProvider&gt;</code>: the <code>frozen</code> activity level works, route changes park the hosted subtree so iframes don't reload, and Next.js anchors dock after hydration.</li>
+            <li>The automatic video fallback fires <code>onOpen</code> once per open (Safari used to report it twice).</li>
+          </ul>
+
+          <p>See <a href="#errors-reference" class="text-[var(--color-accent-dark)] hover:underline">Errors &amp; Rejections</a> for the full list of error codes.</p>
         `
       },
       {
@@ -174,68 +247,64 @@ document.getElementById('btn-open').addEventListener('click', () => {
           <p>The core factory method <code>createPip(options)</code> registers and returns a controller instance for a single PiP window cycle.</p>
 
           <h3>PipOptions Configuration</h3>
+          <p>Every option is optional.</p>
           <table>
-            <thead>
-              <tr>
-                <th>Option</th>
-                <th>Type</th>
-                <th>Default</th>
-                <th>Description</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
             <tbody>
-              <tr>
-                <td><code>mode</code></td>
-                <td><code>'move' | 'clone' | 'portal'</code></td>
-                <td><code>'move'</code></td>
-                <td>Strategical relocation. <code>'move'</code> physically detaches elements. <code>'portal'</code> is optimized for framework hooks.</td>
-              </tr>
-              <tr>
-                <td><code>copyStyles</code></td>
-                <td><code>'sync' | 'once' | false</code></td>
-                <td><code>'sync'</code></td>
-                <td>Clones style blocks. <code>'sync'</code> uses a <code>MutationObserver</code> to replicate HMR or CSS-in-JS styles live.</td>
-              </tr>
-              <tr>
-                <td><code>fallback</code></td>
-                <td><code>'new-tab' | 'none'</code></td>
-                <td><code>'new-tab'</code></td>
-                <td>Behavior when PiP is unsupported. <code>'new-tab'</code> loads <code>fallbackUrl</code> in a popup window.</td>
-              </tr>
-              <tr>
-                <td><code>fallbackUrl</code></td>
-                <td><code>string</code></td>
-                <td><code>undefined</code></td>
-                <td>Target path for fallback browser window. Mandatory if <code>fallback</code> is set to <code>'new-tab'</code>.</td>
-              </tr>
-              <tr>
-                <td><code>reserveSpace</code></td>
-                <td><code>boolean</code></td>
-                <td><code>true</code></td>
-                <td>Maintains placeholder box in parent layout to prevent surrounding element shifting.</td>
-              </tr>
-              <tr>
-                <td><code>forwardKeyboardEvents</code></td>
-                <td><code>boolean</code></td>
-                <td><code>true</code></td>
-                <td>Bridges <code>keydown</code> and <code>keyup</code> events back to main opener window so global shortcuts keep executing.</td>
-              </tr>
-              <tr>
-                <td><code>restoreFocus</code></td>
-                <td><code>boolean</code></td>
-                <td><code>true</code></td>
-                <td>Restores active focus state and selected ranges when returning elements back to the host document.</td>
-              </tr>
+              <tr><td><code>id</code></td><td><code>string</code></td><td><code>pip-instance-N</code></td><td>Instance id. Not registered automatically; see the Global Registry.</td></tr>
+              <tr><td><code>mode</code></td><td><code>'move' | 'clone'</code></td><td><code>'move'</code></td><td><code>move</code> relocates the real node (state survives). <code>clone</code> puts a <code>cloneNode(true)</code> copy in the window. <code>'portal'</code> exists in the <code>DomMode</code> type for the React binding only.</td></tr>
+              <tr><td><code>copyStyles</code></td><td><code>'sync' | 'once'</code></td><td><code>'sync'</code></td><td>Copy <code>&lt;link rel="stylesheet"&gt;</code> and <code>&lt;style&gt;</code> into the window; <code>sync</code> keeps watching for new styles. The <code>className</code>, inline <code>style</code> and <code>data-*</code> attributes of <code>&lt;html&gt;</code> and <code>&lt;body&gt;</code> are copied too (for example a <code>dark</code> class). Styles cannot be turned off.</td></tr>
+              <tr><td><code>width</code> / <code>height</code></td><td><code>number</code></td><td>from <code>contentEl</code></td><td>Window size. Defaults to the size of <code>contentEl</code> (clamped to 300–1600 × 200–1200), or 900 × 600 if it has no size.</td></tr>
+              <tr><td><code>fixedSize</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Lock the PiP document (<code>html</code>/<code>body</code>) to the requested px size with <code>overflow: hidden</code>. The user can still resize the window; it is not resized back (browsers only allow <code>resizeTo()</code> with a fresh gesture).</td></tr>
+              <tr><td><code>reserveSpace</code></td><td><code>boolean</code></td><td><code>true</code></td><td><code>move</code> mode: freeze the size of <code>originEl</code> and <code>contentEl</code> while the content is away, so the page does not jump.</td></tr>
+              <tr><td><code>centerInPip</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Center the content in the window with flexbox.</td></tr>
+              <tr><td><code>pipBodyStyles</code></td><td><code>Partial&lt;CSSStyleDeclaration&gt; | false</code></td><td>built-in resets</td><td>Styles for the PiP <code>&lt;body&gt;</code>. An object <strong>replaces</strong> the built-in resets; <code>false</code> skips body styling entirely. Trusted values only.</td></tr>
+              <tr><td><code>forwardKeyboardEvents</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Re-dispatch real <code>keydown</code>/<code>keyup</code> from the PiP window on the opener, so page shortcuts keep working. <code>preventDefault()</code> on the copy also prevents the original.</td></tr>
+              <tr><td><code>forwardPointerEvents</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Re-dispatch real pointer and mouse events on the opener. Coordinates are PiP-relative.</td></tr>
+              <tr><td><code>restoreScroll</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Save and restore scroll positions inside <code>contentEl</code> across the round trip.</td></tr>
+              <tr><td><code>restoreFocus</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Save and restore focus and input/textarea selection across the round trip.</td></tr>
+              <tr><td><code>fallback</code></td><td><code>'none' | 'new-tab' | function</code></td><td><code>'none'</code></td><td>What <code>open()</code> does when Document PiP is unavailable (or <code>forceFallback</code> is set) and the video fallback does not apply. <code>'new-tab'</code> opens <code>fallbackUrl</code>. A function <code>({ contentEl, originEl, resolvedOptions }) =&gt; cleanup | void</code> runs your own; its cleanup runs on <code>close()</code>.</td></tr>
+              <tr><td><code>fallbackUrl</code></td><td><code>string</code></td><td>—</td><td>Required for <code>'new-tab'</code>. Only <code>http:</code>/<code>https:</code>; otherwise <code>open()</code> rejects with <code>ERR_INVALID_FALLBACK</code>.</td></tr>
+              <tr><td><code>forceFallback</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Use the fallback path even when Document PiP exists (testing, fallback-first apps).</td></tr>
+              <tr><td><code>disableVideoPip</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Turn off the automatic native video PiP fallback.</td></tr>
+              <tr><td><code>preferInitialWindowPlacement</code></td><td><code>boolean</code></td><td>—</td><td>Ask the browser to open at its default position instead of where the last window was.</td></tr>
+              <tr><td><code>disallowReturnToOpener</code></td><td><code>boolean</code></td><td>—</td><td>Hide the browser's "back to tab" button in the window frame.</td></tr>
             </tbody>
           </table>
 
-          <h3>Lifecycle Events</h3>
+          <h3>Callbacks</h3>
           <ul>
-            <li><code>onBeforeOpen</code>: Executed before request window resolves. Return <code>false</code> to intercept and cancel window open.</li>
-            <li><code>onOpen</code>: Fired instantly when browser PiP window opens, passing raw <code>Window</code> handles.</li>
-            <li><code>onPipWindowReady</code>: Fired after the first paint cycle inside the newly provisioned window completes.</li>
-            <li><code>onClose</code>: Triggered on window close.</li>
+            <li><code>onBeforeOpen()</code>: runs before a Document PiP window is requested. Return (or resolve) <code>false</code> to cancel. Not called on the video or fallback path.</li>
+            <li><code>onOpen(win)</code>: right after opening. <code>win</code> is the PiP window; on the video PiP and fallback paths it is the opener <code>window</code>.</li>
+            <li><code>onPipWindowReady(win)</code>: Document PiP only, on the next animation frame after <code>onOpen</code>.</li>
+            <li><code>onClose()</code>: after the window closed and everything was restored.</li>
+            <li><code>onError(err)</code>: when opening fails. <code>open()</code> still rejects with the same error. A throwing <code>onError</code> is logged and does not replace the rejection. Not called for <code>ERR_OPEN_ABORTED</code>.</li>
           </ul>
+
+          <h3>Instance members</h3>
+          <table>
+            <thead><tr><th>Member</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>open(elements?)</code></td><td>Open the window. <code>elements</code> (<code>{ contentEl?, originEl? }</code>) overrides the default slots for this session. Rejects on failure. Resolves without opening when already open or opening, when <code>onBeforeOpen</code> returns <code>false</code>, or when nothing can open and <code>fallback</code> is <code>'none'</code> (a warning is logged).</td></tr>
+              <tr><td><code>close()</code></td><td>Close the window and restore the content. Also cancels a pending <code>open()</code>.</td></tr>
+              <tr><td><code>toggle(elements?)</code></td><td><code>close()</code> if open, otherwise <code>open(elements)</code>. Handle its promise like <code>open()</code>.</td></tr>
+              <tr><td><code>isOpen()</code></td><td><code>true</code> while a session is open.</td></tr>
+              <tr><td><code>getPipWindow()</code></td><td>The PiP <code>Window</code>, or <code>null</code> (also <code>null</code> on the video and fallback paths).</td></tr>
+              <tr><td><code>getState()</code></td><td><code>{ isOpen, isSupported, pipWindow }</code>. A new object on each change, so it works as a <code>useSyncExternalStore</code> snapshot.</td></tr>
+              <tr><td><code>subscribe(fn)</code></td><td>Called on every state change. Returns an unsubscribe function.</td></tr>
+              <tr><td><code>updateOptions(options)</code></td><td>Merge new options. <code>undefined</code> values are ignored; <code>id</code> and <code>mode</code> cannot change after creation. Recomputes <code>isSupported</code>.</td></tr>
+              <tr><td><code>destroy()</code></td><td>Permanent teardown: closes, aborts <code>signal</code>, drops listeners and element references. Afterwards every method is inert.</td></tr>
+              <tr><td><code>id</code>, <code>signal</code>, <code>destroyed</code></td><td>The instance id; an <code>AbortSignal</code> aborted by <code>destroy()</code> (pass it to your own <code>addEventListener</code> calls); and <code>true</code> after <code>destroy()</code>.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-info">
+            <strong><code>isSupported</code> is per instance.</strong> It answers "will <code>open()</code> do something
+            here?", not "does this browser have Document PiP?". It is <code>true</code> when Document PiP is available
+            (and <code>forceFallback</code> is off), when the video fallback applies (the content holds exactly one
+            <code>&lt;video&gt;</code>, a video PiP API exists and <code>disableVideoPip</code> is not set), or when a usable
+            <code>fallback</code> is set. For the browser-level check, call <code>isSupported()</code> from the package.
+          </div>
         `
       },
       {
@@ -257,7 +326,7 @@ registerPip('main-player', pipInstance);
 
 // In a completely separate Navigation component:
 document.getElementById('nav-toggle-btn').addEventListener('click', () => {
-  getPip('main-player')?.toggle();
+  getPip('main-player')?.toggle().catch((err) =&gt; console.warn('PiP failed:', err));
 });</code></pre>
 
           <h3>Practical Implementations</h3>
@@ -266,7 +335,7 @@ document.getElementById('nav-toggle-btn').addEventListener('click', () => {
           <p>Bind key codes on your opener page to trigger remote float/restore:</p>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>window.addEventListener('keydown', (e) => {
   if (e.altKey && e.key.toLowerCase() === 'p') {
-    getPip('main-player')?.toggle();
+    getPip('main-player')?.toggle().catch((err) =&gt; console.warn('PiP failed:', err));
   }
 });</code></pre>
 
@@ -329,6 +398,12 @@ dispose();</code></pre>
             That makes the outcome depend on JSX order. Arbitrate explicitly with <code>when</code> instead.
           </div>
 
+          <h3>Gesture-free auto-PiP</h3>
+          <p>Chrome can enter PiP with no gesture, but only when the origin is eligible (camera or microphone in use, an installed PWA, or the user allowed the site at <code>chrome://settings/content/autoPictureInPicture</code>) <em>and</em> the page registered the <code>enterpictureinpicture</code> Media Session action (<code>mediaSession: true</code>). That is why Google Meet always works. On an ineligible origin the browser simply never calls it.</p>
+          <h3>What counts as leaving</h3>
+          <p>It listens for <code>visibilitychange</code>: switching tabs or minimising the window. Switching to another app while the browser window stays visible does not hide the document, so nothing happens. It deliberately ignores <code>blur</code>, which also fires for the address bar and DevTools.</p>
+          <p>Don't hand-roll a <code>visibilitychange</code> handler that calls <code>requestPictureInPicture()</code>: it works only if the user interacted in the last few seconds. A video gets its gesture from the click on play and expires after about a minute; an editor gets a fresh one with every keystroke. With more than two candidates, use <strong>one</strong> auto-PiP whose <code>enter</code> picks the target.</p>
+
           <h3>registerEnterPipAction(enter)</h3>
           <p>
             Registers the <code>enterpictureinpicture</code> Media Session action on its own — the page-side
@@ -338,6 +413,44 @@ dispose();</code></pre>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { registerEnterPipAction } from '@pip-it-up/core';
 
 const unregister = registerEnterPipAction(() =&gt; instance.open());</code></pre>
+        `
+      },
+      {
+        id: 'errors-reference',
+        title: 'Errors & Rejections',
+        keywords: ['errors', 'reject', 'catch', 'abort', 'AbortError', 'PipError', 'ERR_OPEN_ABORTED', 'ERR_WINDOW_CLOSED', 'ERR_INVALID_FALLBACK', 'ERR_DESTROYED', 'ERR_UNKNOWN_ID', 'ERR_DUPLICATE_ANCHOR', 'onError', 'PipOpenErrorCode'],
+        summary: 'How open() and toggle() fail, and the error codes core attaches.',
+        content: `
+          <p>
+            <code>open()</code> and <code>toggle()</code> reject on failure. Browser errors pass through unchanged
+            (for example <code>NotAllowedError</code> without a recent click, including on the video fallback).
+            Errors raised by core carry a <code>code</code>, typed as <code>PipOpenErrorCode</code>.
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Code</th><th><code>name</code></th><th>When</th><th><code>onError</code> called?</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>ERR_OPEN_ABORTED</code></td><td><code>AbortError</code></td><td><code>close()</code> or <code>destroy()</code> ran while <code>open()</code> was pending. A late window is closed.</td><td>No</td></tr>
+              <tr><td><code>ERR_WINDOW_CLOSED</code></td><td><code>PipError</code></td><td>The window was already closed when the browser handed it over.</td><td>Yes</td></tr>
+              <tr><td><code>ERR_INVALID_FALLBACK</code></td><td><code>PipError</code></td><td><code>fallback: 'new-tab'</code> with a missing or non-<code>http(s)</code> <code>fallbackUrl</code>.</td><td>Yes</td></tr>
+              <tr><td><code>ERR_DESTROYED</code></td><td>—</td><td>Not a rejection: <code>open()</code> on a destroyed instance logs a <code>console.warn</code> and resolves.</td><td>No</td></tr>
+            </tbody>
+          </table>
+
+          <p>If anything throws after the window appeared (in <code>onOpen</code>, style sync, a bridge), the window is closed again and <code>open()</code> rejects with that error.</p>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>pip.open().catch((err) => {
+  if (err.name === 'AbortError') return; // you cancelled it
+  console.error(err.code ?? err.name, err);
+});</code></pre>
+
+          <div class="alert alert-info">
+            <strong>React diagnostics.</strong> In development builds, <code>ERR_UNKNOWN_ID</code> throws (an error
+            boundary will catch it) and <code>ERR_DUPLICATE_ANCHOR</code> warns, so mistakes in
+            <code>&lt;PipProvider&gt;</code> / <code>&lt;PipAnchor&gt;</code> wiring surface early.
+          </div>
         `
       },
       {
@@ -443,6 +556,199 @@ createAutoPip(enter, { signal: instance.signal });</code></pre>
           </div>
         `
       },
+      {
+        id: 'native-video-pip',
+        title: 'Native Video PiP',
+        keywords: ['video pip', 'enterVideoPip', 'exitVideoPip', 'isInVideoPip', 'isVideoPipSupported', 'isWebkitPipSupported', 'safari', 'ios', 'playsinline', 'disableVideoPip'],
+        summary: 'Float a single video with the browser\'s own PiP API, and the caveats that apply.',
+        content: `
+          <p>
+            Two different browser APIs exist. Use native video PiP when the content <strong>is</strong> a
+            <code>&lt;video&gt;</code>; use Document PiP (<code>createPip</code>) for anything else.
+          </p>
+          <table>
+            <thead><tr><th></th><th>Native video PiP</th><th>Document PiP</th></tr></thead>
+            <tbody>
+              <tr><td>What floats</td><td>the video's frames, drawn by the OS</td><td>a real window with your DOM</td></tr>
+              <tr><td>Moves DOM?</td><td>no</td><td>yes</td></tr>
+              <tr><td>Support</td><td>~95%, including Safari/iOS and Firefox</td><td>Chrome/Edge 116+, Firefox 151+</td></tr>
+            </tbody>
+          </table>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { enterVideoPip, exitVideoPip, isInVideoPip } from '@pip-it-up/core';
+
+const video = document.querySelector('video')!;
+button.addEventListener('click', () =&gt; {
+  const action = isInVideoPip() ? exitVideoPip(video) : enterVideoPip(video);
+  action.catch((err) =&gt; console.warn('Video PiP failed:', err));
+});</code></pre>
+
+          <table>
+            <thead><tr><th>Function</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>isSupported()</code></td><td>The browser has Document PiP.</td></tr>
+              <tr><td><code>isVideoPipSupported()</code></td><td>The standard video PiP API exists.</td></tr>
+              <tr><td><code>isWebkitPipSupported()</code></td><td>Older WebKit presentation mode exists.</td></tr>
+              <tr><td><code>isInVideoPip()</code></td><td>Some element on the page is in video PiP.</td></tr>
+              <tr><td><code>enterVideoPip(video)</code></td><td>Adds <code>playsinline</code> if missing (needed on iOS), then tries <code>requestPictureInPicture()</code>, <code>webkitSetPresentationMode('picture-in-picture')</code>, <code>webkitEnterFullscreen()</code>. Rejects if none exists.</td></tr>
+              <tr><td><code>exitVideoPip(video)</code></td><td>Exits through the same three paths.</td></tr>
+            </tbody>
+          </table>
+          <p>
+            Track state with the video's own events (<code>enterpictureinpicture</code>, <code>leavepictureinpicture</code>,
+            and <code>webkitpresentationmodechanged</code> on WebKit) so your UI stays right when the user closes the overlay
+            itself. React's <code>useVideoPip</code> does this for you.
+          </p>
+          <p>
+            <strong>Automatic fallback:</strong> when Document PiP is unavailable and the content holds exactly one
+            <code>&lt;video&gt;</code>, <code>createPip().open()</code> uses native video PiP instead. Opt out with
+            <code>disableVideoPip: true</code>.
+          </p>
+
+          <h3>Caveats</h3>
+          <ol>
+            <li><strong>Needs a real user gesture.</strong> Without one: <code>NotAllowedError</code>.</li>
+            <li><strong>Tab-switch PiP is limited.</strong> A <code>visibilitychange</code> handler only succeeds within the activation window after a click. See Automatic PiP.</li>
+            <li><strong>One PiP element per document.</strong> Requesting a second one moves the overlay to it.</li>
+            <li><strong>No audio PiP.</strong> To float an audio player's controls and artwork, use Document PiP.</li>
+            <li><strong>The overlay cannot be styled.</strong> The OS draws it. Custom controls need Document PiP.</li>
+            <li><strong><code>disablePictureInPicture</code> blocks it.</strong> The browser refuses when the attribute is set.</li>
+            <li><strong>iOS needs <code>playsinline</code>.</strong> Without it the video plays fullscreen. <code>enterVideoPip</code> adds it for you.</li>
+          </ol>
+        `
+      },
+      {
+        id: 'core-gotchas',
+        title: 'Gotchas',
+        keywords: ['gotchas', 'iframe', 'cross-origin', 'youtube', 'clone', 'move', 'pointer coordinates', 'pipItUpBridged', 'prosemirror', 'tiptap', 'monaco', 'style sync', 'new-tab'],
+        summary: 'Known browser and library limits: iframes, cached documents, pointer coordinates, move vs clone.',
+        content: `
+          <ul>
+            <li><strong>Cross-origin iframes do not work in the PiP window.</strong> YouTube, Vimeo, Maps and Spotify embeds get reloaded in a new document and refuse to play (YouTube shows Error 153). This is a browser limitation. For video, use a <code>&lt;video&gt;</code> with a direct source URL.</li>
+            <li><strong><code>move</code> keeps state.</strong> The real node relocates, so <code>&lt;video&gt;</code> and <code>&lt;audio&gt;</code> keep playing, <code>&lt;canvas&gt;</code> keeps its buffer and WebRTC streams stay connected.</li>
+            <li><strong>Libraries that cache <code>document</code> or <code>window</code>.</strong> Libraries that read <code>node.ownerDocument.defaultView</code> live (Monaco) need nothing. Libraries that cache it (ProseMirror's <code>EditorView</code>) need their own refresh: call <code>view.updateRoot()</code> in <code>onPipWindowReady</code> and again after <code>close()</code>. Prefer the refresh over rebuilding the component, which loses undo history, scroll and selection.</li>
+            <li><strong>Style sync fetches external CSS twice</strong> (once per document). A stylesheet behind auth or a private CDN can fail silently in the PiP window. Use <code>copyStyles: 'once'</code> plus inlined critical CSS.</li>
+            <li><strong>Bridged pointer coordinates are PiP-relative.</strong> A click at (20, 20) in the PiP window arrives at (20, 20) on the opener, which is a different element. Bridged events carry a non-enumerable <code>pipItUpBridged: true</code>; skip them in coordinate-based code, or set <code>forwardPointerEvents: false</code>. Forwarded types: <code>pointerdown</code>, <code>pointermove</code>, <code>pointerup</code>, <code>pointercancel</code>, <code>mousedown</code>, <code>mousemove</code>, <code>mouseup</code>, <code>click</code>.</li>
+            <li><strong><code>'new-tab'</code> has no close signal.</strong> The instance stays open until you call <code>close()</code>.</li>
+            <li><strong><code>mode: 'portal'</code></strong> is for the React binding. In vanilla <code>createPip</code> it moves nothing; use <code>move</code> or <code>clone</code>.</li>
+          </ul>
+
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>window.addEventListener('pointerdown', (e) =&gt; {
+  if ((e as PointerEvent &amp; { pipItUpBridged?: boolean }).pipItUpBridged) return;
+  // opener-only logic
+});</code></pre>
+
+          <h3>Move vs clone</h3>
+          <table>
+            <thead><tr><th>Mode</th><th>Use when</th><th>Avoid when</th></tr></thead>
+            <tbody>
+              <tr><td><code>move</code></td><td>The content has state: video, canvas, WebGL, WebRTC, editors, live data.</td><td>You need it visible in both windows at once (a node has one parent).</td></tr>
+              <tr><td><code>clone</code></td><td>A static, read-only copy (a preview, a printable view).</td><td>The content has state. Listeners and form state are not copied, <code>&lt;script&gt;</code> does not re-run, and inline handlers (<code>onclick="…"</code>) <strong>are</strong> copied and run in the PiP window.</td></tr>
+            </tbody>
+          </table>
+        `
+      },
+      {
+        id: 'core-security',
+        title: 'Security, CSP & Trusted Types',
+        keywords: ['security', 'csp', 'content security policy', 'trusted types', 'nonce', 'same-origin', 'keyboard bridge', 'registry', 'vulnerability', 'xss', 'innerHTML'],
+        summary: 'The security model, what to watch for, and compatibility with strict CSP and Trusted Types.',
+        content: `
+          <ul>
+            <li><strong>Same-origin only.</strong> The PiP window is same-origin with the opener by design and needs a secure context (HTTPS). Opening from inside an <code>&lt;iframe&gt;</code> throws <code>NotAllowedError</code>.</li>
+            <li><strong>Keyboard bridge.</strong> Only real (<code>isTrusted</code>) keystrokes are forwarded. Every opener <code>keydown</code>/<code>keyup</code> listener sees them (analytics, session replay), so set <code>forwardKeyboardEvents: false</code> when the window holds passwords, card numbers or private chat. Forwarded keys are dispatched on <code>window</code> only, so a hotkey listener scoped to a container element never sees them.</li>
+            <li><strong>Pointer bridge.</strong> Only real (<code>isTrusted</code>) events are forwarded. Coordinates are PiP-relative.</li>
+            <li><strong>Style sync.</strong> Inline <code>&lt;style&gt;</code> text is copied verbatim, so injected CSS on the opener reaches the PiP window too.</li>
+            <li><strong><code>fallbackUrl</code>.</strong> Only <code>http:</code>/<code>https:</code> pass. The new tab navigates to the validated <code>href</code>, so a <code>&lt;base href&gt;</code> cannot redirect it, and opens with <code>noopener,noreferrer</code>. Open redirects are still possible, so allowlist URLs derived from user data.</li>
+            <li><strong><code>clone</code> mode.</strong> <code>cloneNode(true)</code> copies inline handlers, the same trust level as <code>innerHTML</code>. Never clone untrusted HTML. React never uses clone mode.</li>
+            <li><strong><code>pipBodyStyles</code>.</strong> Written to <code>body.style</code> without sanitising. Trusted values only.</li>
+            <li><strong>Registry.</strong> Same-page coordination, not isolation: any script on the page can call <code>getPip(id).open()</code>. Never build ids from user content.</li>
+          </ul>
+
+          <h3>CSP and Trusted Types</h3>
+          <p>
+            pip-it-up is compatible with <code>require-trusted-types-for 'script'</code> and <code>script-src 'self'</code> and
+            needs no Trusted Types policy: it never converts strings into script or markup. It uses no
+            <code>innerHTML</code>, <code>outerHTML</code>, <code>insertAdjacentHTML</code>, <code>eval</code> or <code>new Function</code>.
+          </p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>require-trusted-types-for 'script';
+script-src 'self';
+style-src 'self' 'unsafe-inline';</code></pre>
+          <div class="alert alert-warning">
+            <strong>The nonce caveat.</strong> Cloned <code>&lt;style&gt;</code> and <code>&lt;link&gt;</code> nodes keep their
+            original <code>nonce</code>. With a <em>per-document</em> nonce, the value will not validate inside the PiP document and the
+            window renders <strong>unstyled</strong>. Use a <em>per-response</em> nonce, or <code>copyStyles: 'once'</code> with
+            pre-inlined critical CSS. The PiP window inherits the opener's CSP and it cannot be relaxed there.
+          </div>
+          <p>
+            pip-it-up has not had a formal third-party security audit. Report vulnerabilities privately through
+            <a href="https://github.com/Shakya47/pip-it-up/security/advisories/new" target="_blank" rel="noopener" class="text-[var(--color-accent-dark)] hover:underline">GitHub Security Advisories</a>.
+          </p>
+        `
+      },
+      {
+        id: 'vanilla-route-persistence',
+        title: 'Vanilla Route Persistence',
+        keywords: ['vanilla', 'route persistence', 'navigation', 'registerElements', 'registerTeardown', 'isUsable', 'parking container', 'moveBefore'],
+        summary: 'Keep a PiP window alive across navigation in plain JS, using core primitives.',
+        content: `
+          <p>
+            In React this is built in (<code>&lt;PipProvider&gt;</code> / <code>&lt;PipAnchor&gt;</code>). Core has no packaged
+            equivalent, but it has every primitive you need. Vanilla JS has no reconciler, so a node you hold stays alive and you
+            move it yourself.
+          </p>
+          <table>
+            <thead><tr><th>You need</th><th>Core gives you</th></tr></thead>
+            <tbody>
+              <tr><td>Swap the restore target when the UI changes</td><td><code>registerElements</code> and its compare-and-clear <code>release()</code></td></tr>
+              <tr><td>Survive an origin being replaced mid-session</td><td>The restore target is read at close time</td></tr>
+              <tr><td>Move content while the PiP document is still alive</td><td><code>registerTeardown</code></td></tr>
+              <tr><td>Know whether a node is still safe to touch</td><td><code>isUsable(el)</code></td></tr>
+              <tr><td>Tie listeners to the instance's lifetime</td><td><code>instance.signal</code></td></tr>
+              <tr><td>Share one instance across modules</td><td><code>registerPip</code> / <code>getPip</code>, owner-only <code>unregisterPip(id, instance)</code></td></tr>
+            </tbody>
+          </table>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { createPip, isUsable, registerPip } from '@pip-it-up/core';
+
+const contentEl = document.getElementById('tracker')!;
+const pip = createPip({ id: 'tracker', mode: 'move' });
+registerPip('tracker', pip);
+
+// A hidden container you own. Parked content stays CONNECTED:
+// detaching a &lt;video&gt; would pause it.
+const parked = document.createElement('div');
+parked.setAttribute('inert', '');
+parked.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;content-visibility:hidden';
+document.body.appendChild(parked);
+
+let slot: HTMLElement | null = null;
+const home = () =&gt; (isUsable(slot) ? slot! : parked);
+
+const registration = pip.registerElements({ contentEl, originEl: home() });
+home().appendChild(contentEl);
+
+export function onRouteChange(nextSlot: HTMLElement | null) {
+  slot = nextSlot;
+  registration.update({ originEl: home() });
+  // While the window is open the content lives in the PiP document.
+  if (contentEl.ownerDocument === document) home().appendChild(contentEl);
+}
+
+// Put the content home while the PiP document is still alive.
+pip.registerTeardown(() =&gt; home().appendChild(contentEl));</code></pre>
+          <ul>
+            <li><code>update()</code> re-points the origin in place. Releasing and re-registering also works, but briefly vacates <code>contentEl</code> too.</li>
+            <li>If the widget can open while parked, pass <code>width</code> and <code>height</code>: parked content has no size to measure, so the window falls back to 900 × 600.</li>
+            <li>When the feature goes away: <code>registration.release()</code>, <code>unregisterPip('tracker', pip)</code>, <code>pip.destroy()</code>.</li>
+          </ul>
+          <h3>What you still write</h3>
+          <ul>
+            <li>The parking container and your move policy. <code>Element.moveBefore()</code> preserves state on same-document moves but throws across documents, so fall back to <code>appendChild</code> when moving into or out of the PiP window.</li>
+            <li>An anchor or registry abstraction, if several pages can host the widget.</li>
+            <li>Layout-shift protection and dormancy (pausing the widget while parked).</li>
+          </ul>
+        `
+      },
     ]
   },
   {
@@ -479,6 +785,33 @@ createAutoPip(enter, { signal: instance.signal });</code></pre>
             on the wrapper being layout-invisible, add your own styles to compensate.
           </div>
 
+          <h4>Full props</h4>
+          <p><code>&lt;PipWrapper&gt;</code> accepts every core option except <code>mode</code> (it always portals; passing one from JavaScript logs a warning), plus:</p>
+          <table>
+            <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>open</code></td><td><code>boolean</code></td><td>—</td><td>Controlled open state. Opening needs a user gesture, so set it from a click handler. Setting it back to <code>false</code> closes the window, or cancels an open still pending.</td></tr>
+              <tr><td><code>defaultOpen</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Try to open once on mount (uncontrolled only). Usually blocked without a gesture; the failure is logged.</td></tr>
+              <tr><td><code>onOpenChange</code></td><td><code>(open: boolean) =&gt; void</code></td><td>—</td><td>Called when the window opens or closes.</td></tr>
+              <tr><td><code>as</code></td><td><code>ElementType</code></td><td><code>'div'</code></td><td>Element for the content box (the part that moves).</td></tr>
+              <tr><td><code>originAs</code></td><td><code>ElementType</code></td><td><code>'div'</code></td><td>Element for the origin box (stays on the page). A custom component must forward its ref.</td></tr>
+              <tr><td><code>placeholder</code></td><td><code>ReactNode</code></td><td>"📺 In PiP" + Restore button</td><td>Shown in the page while the content is in PiP.</td></tr>
+              <tr><td><code>placeholderClassName</code></td><td><code>string</code></td><td>—</td><td>Class for the placeholder's wrapper.</td></tr>
+              <tr><td><code>id</code></td><td><code>string</code></td><td>—</td><td>Registers the instance so a remote <code>&lt;PipTrigger pipId&gt;</code> can control it.</td></tr>
+              <tr><td><code>onError</code></td><td><code>(err) =&gt; void</code></td><td>—</td><td>Called when opening fails. When set, the wrapper and its triggers don't log their own warning.</td></tr>
+              <tr><td><code>ref</code></td><td><code>Ref&lt;HTMLElement&gt;</code></td><td>—</td><td>Receives the origin element.</td></tr>
+            </tbody>
+          </table>
+          <p>Without <code>width</code>/<code>height</code>, the window matches the size of your content's own element (when it is a single element with no text beside it).</p>
+
+          <h4>When Document PiP is missing</h4>
+          <ol>
+            <li><strong>Document PiP</strong>, if the browser has it.</li>
+            <li><strong>Native video PiP</strong>, if the content holds exactly one <code>&lt;video&gt;</code> (the root or its only video descendant). This makes a player work on Safari and iOS with no setup. A <code>&lt;video&gt;</code> rendered later is picked up. <code>disableVideoPip</code> turns this off.</li>
+            <li><strong><code>fallback</code></strong>: <code>'none'</code> does nothing; <code>'new-tab'</code> opens <code>fallbackUrl</code> with <code>noopener,noreferrer</code>; a function runs your own.</li>
+          </ol>
+          <p>If none apply, the instance is unsupported and <code>&lt;PipTrigger&gt;</code> renders <code>renderUnsupported</code>.</p>
+
           <h4>Controlled Example</h4>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>const [isFloating, setIsFloating] = useState(false);
 
@@ -493,14 +826,41 @@ return (
 );</code></pre>
 
           <h3>&lt;PipTrigger&gt;</h3>
-          <p>Toggles parent state context. Supplying <code>asChild</code> allows wrapping custom buttons:</p>
+          <p>A button that toggles the window. Its label switches between <code>openLabel</code> and <code>closeLabel</code>. Inside a <code>&lt;PipWrapper&gt;</code> it controls that wrapper; use <code>asChild</code> to render your own element:</p>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>&lt;PipTrigger asChild&gt;
   &lt;button className="px-4 py-2 border rounded"&gt;Toggle Float&lt;/button&gt;
 &lt;/PipTrigger&gt;</code></pre>
+          <p>With <code>asChild</code>, put <code>onClick</code> on <code>&lt;PipTrigger&gt;</code>, not the child: the child's own <code>onClick</code> replaces the toggle.</p>
+          <p><strong>Remote trigger.</strong> Give a wrapper an <code>id</code> and point a trigger anywhere in the app at it:</p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>// In a navbar
+&lt;PipTrigger pipId="main-player"&gt;Open player&lt;/PipTrigger&gt;
+
+// Somewhere else
+&lt;PipWrapper id="main-player"&gt;&lt;Player /&gt;&lt;/PipWrapper&gt;</code></pre>
+          <table>
+            <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>pipId</code></td><td><code>string</code></td><td>—</td><td>Control the instance registered under this id instead of the nearest wrapper.</td></tr>
+              <tr><td><code>asChild</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Render the single child element instead of a <code>&lt;button&gt;</code>.</td></tr>
+              <tr><td><code>openLabel</code> / <code>closeLabel</code></td><td><code>string</code></td><td><code>'↗ Pop out'</code> / <code>'⊠ Close'</code></td><td>Labels while closed / open.</td></tr>
+              <tr><td><code>renderOpen</code> / <code>renderClose</code></td><td><code>ReactNode</code></td><td>—</td><td>Replace the labels. <code>children</code> win over every label prop.</td></tr>
+              <tr><td><code>renderUnsupported</code></td><td><code>ReactNode</code></td><td><code>null</code></td><td>Rendered when the instance can't open anything.</td></tr>
+              <tr><td><code>hideInPip</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Hide the trigger while the window is open.</td></tr>
+            </tbody>
+          </table>
+          <h4>What it renders</h4>
+          <ul>
+            <li>Server render and first client render: nothing.</li>
+            <li><code>pipId</code> with no instance registered yet: a disabled button.</li>
+            <li>The instance can't open anything: <code>renderUnsupported</code>.</li>
+            <li>Otherwise: the button, with <code>aria-pressed</code>.</li>
+          </ul>
+          <p>A click that fails logs a <code>[PipTrigger]</code> warning unless the owner has <code>onError</code>. An open cancelled by <code>close()</code> is not logged.</p>
 
           <h3>Accessibility (Aria Compliance)</h3>
           <ul>
             <li><strong>Live Regions:</strong> Automatically manages a visually hidden <code>aria-live="polite"</code> region to announce screen-reader updates when portal transitions occur.</li>
+            <li><strong>Trigger:</strong> <code>&lt;PipTrigger&gt;</code> sets <code>aria-pressed</code>. Its accessible name is its visible label, so pass <code>aria-label</code> for a name without the glyphs, and document shortcuts with <code>aria-keyshortcuts</code>.</li>
             <li><strong>Focus Redirection:</strong> Shifts viewport focus directly to the first interactive element inside the floating frame upon open, and redirects it back to the launch trigger button upon close.</li>
           </ul>
         `
@@ -513,21 +873,43 @@ return (
         content: `
           <p>Hook integrations let you query support values and read the active window context.</p>
 
-          <h3>usePip()</h3>
-          <p>Returns details about the local wrapped scope:</p>
-          <pre class="code-block font-mono text-xs p-4 mb-6"><code>const { isOpen, pipWindow, instance, isInsidePip } = usePip();</code></pre>
+          <h3>usePip(options?)</h3>
+          <p>Owns a core instance and <strong>moves</strong> the element you point it at (no portal). Takes the same options as <code>createPip()</code>. With <code>id</code>, the instance is also registered for <code>getPip(id)</code> and <code>&lt;PipTrigger pipId&gt;</code>. It is destroyed on unmount and is Strict Mode safe.</p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>const { contentRef, originRef, open, close, isOpen } = usePip({ width: 360, height: 240 });
+
+return (
+  &lt;div ref={originRef}&gt;
+    &lt;div ref={contentRef}&gt;
+      00:42
+      {isOpen &amp;&amp; &lt;button onClick={close}&gt;Back to page&lt;/button&gt;}
+    &lt;/div&gt;
+    {!isOpen &amp;&amp; &lt;button onClick={() =&gt; open().catch(console.warn)}&gt;Pop out&lt;/button&gt;}
+  &lt;/div&gt;
+);</code></pre>
           <ul>
-            <li><code>isOpen</code>: Active open state.</li>
-            <li><code>isInsidePip</code>: Returns <code>true</code> only inside components rendered inside the floating window viewport, making responsive layouts simple.</li>
-            <li><code>pipWindow</code>: Native <code>Window</code> handle.</li>
+            <li><code>contentRef</code> / <code>originRef</code>: attach to the element that moves and the place it returns to.</li>
+            <li><code>open()</code> / <code>toggle()</code>: promises. Call from a user gesture and always <code>.catch</code>; they reject when opening fails, including <code>ERR_OPEN_ABORTED</code> when <code>close()</code> runs first.</li>
+            <li><code>close()</code>: synchronous.</li>
+            <li><code>isOpen</code>, <code>isSupported</code>, <code>pipWindow</code>: live state. <code>pipWindow</code> is <code>null</code> while closed.</li>
           </ul>
+          <p>React handlers (<code>onClick</code>, <code>onChange</code>…) work inside the window: <code>usePip()</code> bridges events from the PiP document back to React. Differences from the page:</p>
+          <ul>
+            <li>Bridged events carry <code>pipItUpBridged: true</code> on <code>e.nativeEvent</code>.</li>
+            <li>The copy is dispatched in the main document, so page-level <strong>capture</strong> listeners on <code>window</code>/<code>document</code> see it too. A global capture <code>keydown</code> shortcut can fire twice; skip events with <code>pipItUpBridged</code> there.</li>
+            <li>React handlers run after native listeners inside the content, and not at all if one stops propagation.</li>
+            <li><code>onSelect</code> misses selection changes made only with the keyboard.</li>
+          </ul>
+          <p><code>&lt;PipWrapper&gt;</code> uses a portal instead and has none of these differences.</p>
+
+          <h3>usePipContext()</h3>
+          <p>Inside a <code>&lt;PipWrapper&gt;</code> or a hosted widget, returns <code>{ instance, state, isInsidePip }</code>: the core instance, <code>{ isOpen, isSupported, pipWindow }</code>, and <code>true</code> while this instance is open (with Document PiP the content renders in the PiP window). Throws outside a wrapper.</p>
 
           <h3>useIsPipSupported()</h3>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>const isSupported = useIsPipSupported();</code></pre>
-          <p>Checks if Document PiP or classic Video PiP is available inside the user's browser.</p>
+          <p><code>true</code> when the <strong>browser</strong> has Document PiP or video PiP. It is <code>false</code> on the server and on the first client render. It does not say whether a given instance can open: for that, read <code>isSupported</code> from <code>usePip()</code> or <code>usePipContext().state</code>.</p>
 
           <h3>useVideoPip(videoRef)</h3>
-          <p>Enables classic Video PiP explicitly for custom video elements on Safari/iOS:</p>
+          <p>Floats a single <code>&lt;video&gt;</code> with the browser's native video PiP. The video stays in your page. Returns <code>isActive</code> (stays correct when the user closes the overlay), <code>enter()</code> / <code>leave()</code> (reject when the browser refuses; <code>enter()</code> also rejects with no <code>&lt;video&gt;</code>), and <code>toggle()</code> (never rejects; logs a <code>[useVideoPip]</code> warning). For anything other than a single video, use <code>&lt;PipWrapper&gt;</code>.</p>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>import { useRef } from 'react';
 import { useVideoPip } from '@pip-it-up/react';
 
@@ -638,8 +1020,38 @@ function Dashboard() {
             <code>prefers-reduced-motion: reduce</code> and when the movement is under 1px.
           </div>
 
+          <div class="alert alert-info">
+            <strong>SSR-safe.</strong> On the server the provider renders only its <code>children</code> and anchors render their box and placeholder. Widgets attach after hydration, so there is no mismatch. Document PiP is browser-only, so mark components that use it <code>"use client"</code>.
+          </div>
+
+          <h3>The three placements</h3>
+          <table>
+            <thead><tr><th>Placement</th><th>When</th><th>Visible</th></tr></thead>
+            <tbody>
+              <tr><td><code>anchor</code></td><td>a <code>&lt;PipAnchor&gt;</code> for its id is on the current route</td><td>yes, inline</td></tr>
+              <tr><td><code>pip</code></td><td>its PiP window is open</td><td>yes, in the window</td></tr>
+              <tr><td><code>garage</code></td><td>no anchor on this route and no window</td><td><strong>no</strong>, but still alive</td></tr>
+            </tbody>
+          </table>
+          <p>A hosted widget can use <code>&lt;PipTrigger&gt;</code> (no <code>pipId</code> needed) and <code>usePipContext()</code> inside itself.</p>
+
+          <h3>Removing a widget</h3>
+          <p>Routes never destroy a hosted widget. To remove one, delete its id from <code>registry</code>:</p>
+          <ul>
+            <li>The widget unmounts at once and loses its React state, even if you add the id back within <code>gcGraceMs</code>.</li>
+            <li>After <code>gcGraceMs</code>, if no anchor claims the id and no window is open, the PiP instance and its container are destroyed. Adding the id later builds a fresh widget.</li>
+            <li>Keep the <code>registry</code> object stable (outside render or <code>useMemo</code>), or every provider render re-renders all widgets.</li>
+          </ul>
+
+          <h3>Several anchors for one id</h3>
+          <p>Several routes may each render an anchor for the same id; navigating between them moves the widget with no unmount. If two are mounted at once, the newest wins and dev builds warn <code>ERR_DUPLICATE_ANCHOR</code>.</p>
+
           <div class="alert alert-warning">
-            <strong>The garage is not a security boundary.</strong> Parked content is marked
+            <strong><code>&lt;PipAnchor&gt;</code> needs a real layout box.</strong> It sets <code>position: relative; display: block</code>. Don't override that with <code>display: contents</code> or <code>position: static</code> (dev builds warn).
+          </div>
+
+          <div class="alert alert-warning">
+            <strong>The garage is not a security boundary.</strong> Parked widgets live in a hidden <code>[data-pip-garage]</code> container on <code>document.body</code>. Parked content is marked
             <code>inert</code> and <code>aria-hidden</code>, and skipped for layout and paint via
             <code>content-visibility: hidden</code>. But parked scripts keep running and parked DOM stays
             queryable by any same-page script. Never host untrusted content in a registry subtree.
@@ -670,6 +1082,8 @@ function Dashboard() {
             </tbody>
           </table>
 
+          <p>Dormancy hooks only work inside a <code>registry</code> widget; elsewhere they throw <code>ERR_NO_HOST</code>. Default <code>useAdaptiveInterval</code> periods: <code>active</code> 1 s, <code>background</code> 15 s, <code>dormant</code> 60 s, <code>frozen</code> no timer. Periods below 250 ms are raised to 250 ms (use <code>requestAnimationFrame</code> for faster). A new inline callback each render does not restart the timer.</p>
+
           <h3>useDormancy()</h3>
           <pre class="code-block font-mono text-xs p-4 mb-6"><code>const { level, placement, isOpen, visible, revealCount } = useDormancy();</code></pre>
           <p>The snapshot is referentially stable and frozen — safe to read every render.</p>
@@ -692,6 +1106,46 @@ function Dashboard() {
   dormant: 60000,
   frozen: null,
 });</code></pre>
+        `
+      },
+      {
+        id: 'react-gotchas',
+        title: 'React Gotchas',
+        keywords: ['css inheritance', 'theme', 'dark', 'tiptap', 'updateRoot', 'prosemirror', 'iframe', 'cached document', 'key remount'],
+        summary: 'Styling inheritance, editors that cache the document, and iframes.',
+        content: `
+          <h3>CSS inheritance</h3>
+          <p>The PiP window is a separate document. Stylesheets and <code>&lt;html&gt;</code>/<code>&lt;body&gt;</code> classes are copied, but your content does not inherit styles from ancestors outside the wrapper (a <code>#root</code> div, a theme provider). Put theme or alignment classes (<code>dark</code>, <code>text-center</code>) on the content itself.</p>
+          <h3>Editors and maps that cache <code>document</code></h3>
+          <p>Monaco needs nothing: it reads the document live. TipTap / ProseMirror caches its root, so call <code>updateRoot()</code> whenever the window changes:</p>
+          <pre class="code-block font-mono text-xs p-4 mb-6"><code>const { state } = usePipContext();
+
+useEffect(() =&gt; {
+  editor?.view.updateRoot();
+}, [editor, state.pipWindow]);</code></pre>
+          <p><code>state.pipWindow</code> changes once per open and once per close, exactly when a cached reference goes stale. Remounting with a <code>key</code> also works but throws away undo history, scroll, selection and IME input; use it only when the library has no refresh, and lift the state you need into a parent, a store or the URL first.</p>
+          <h3>Iframes</h3>
+          <p>Cross-origin embeds (YouTube, Vimeo, Maps) don't work in the window: moving an <code>&lt;iframe&gt;</code> reloads it and the service rejects the new origin. Use a <code>&lt;video&gt;</code> with a direct source instead.</p>
+        `
+      },
+      {
+        id: 'react-errors',
+        title: 'React Errors',
+        keywords: ['ERR_NO_PROVIDER', 'ERR_NO_HOST', 'ERR_UNKNOWN_ID', 'ERR_DUPLICATE_ANCHOR', 'ERR_SHUTTLE_MOVE_FAILED', 'error codes', 'diagnostics'],
+        summary: 'Error and warning codes raised by PipProvider, PipAnchor and the dormancy hooks.',
+        content: `
+          <p>React errors and warnings carry a <code>code</code>. Messages start with <code>[pip-it-up] &lt;code&gt;:</code>.</p>
+          <table>
+            <thead><tr><th>Code</th><th>When</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td><code>ERR_NO_PROVIDER</code></td><td><code>&lt;PipAnchor&gt;</code> rendered outside <code>&lt;PipProvider&gt;</code></td><td>Throws</td></tr>
+              <tr><td><code>ERR_NO_HOST</code></td><td>A dormancy hook called outside a <code>registry</code> widget</td><td>Throws</td></tr>
+              <tr><td><code>ERR_UNKNOWN_ID</code></td><td><code>&lt;PipAnchor id&gt;</code> is not a key of <code>registry</code></td><td>Throws in dev, warns in production</td></tr>
+              <tr><td><code>ERR_DUPLICATE_ANCHOR</code></td><td>Two anchors for one id mounted at once</td><td>Warns in dev only; the newest wins</td></tr>
+              <tr><td><code>ERR_SHUTTLE_MOVE_FAILED</code></td><td>Moving content into the garage, an anchor, the origin or the PiP window failed with both <code>moveBefore</code> and <code>appendChild</code></td><td>Throws</td></tr>
+            </tbody>
+          </table>
+          <p><code>open()</code>/<code>toggle()</code> rejections (<code>ERR_OPEN_ABORTED</code>, <code>ERR_WINDOW_CLOSED</code>, <code>ERR_INVALID_FALLBACK</code>, browser errors like <code>NotAllowedError</code>) come from core: see Errors &amp; Rejections.</p>
         `
       },
     ]

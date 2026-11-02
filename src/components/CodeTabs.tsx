@@ -77,7 +77,7 @@ const pip = createPip(
 );
 
 document.getElementById('pip-btn')
-  .addEventListener('click', () => pip.toggle());`,
+  .addEventListener('click', () => pip.toggle().catch(console.warn));`,
   },
 ];
 
@@ -214,7 +214,7 @@ export default function CodeTabs() {
   }, [active.code]);
 
   return (
-    <section id="code-snippets" className="relative py-24 px-4 sm:px-6">
+    <section id="code-snippets" className="relative py-14 md:py-24 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-12">
